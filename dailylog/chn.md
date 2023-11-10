@@ -4,3 +4,7 @@
 
 https://boardmix.cn/app/share/CAE.CJXtrA0gASoQXySm1km2CdRuWiXLvYKXKjAFQAE/uPPUpF，
 点击链接加入boardmix中的文件「E-R图」
+## 11.10   陈浩楠 更新了类图、开始学习MFC 完成任务时长：5h 剩余时间 0h，遇到问题：VS2022上配置MFC困难 解决：找博客
+
+https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF，
+点击链接加入boardmix中的文件「未命名文件」
