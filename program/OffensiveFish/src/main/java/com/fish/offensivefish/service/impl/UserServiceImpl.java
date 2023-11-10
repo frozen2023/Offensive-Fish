@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
                     userMapper.updateStatus(1,userName);
                     StpUtil.login(userName);
                     SaTokenInfo tokenInfo = StpUtil.getTokenInfo();;
-                    return  SaResult.ok("登入成功！");
+                    return  SaResult.data(tokenInfo);
                 }
                 return  SaResult.error("登入失败，密码输入错误！");
             }
