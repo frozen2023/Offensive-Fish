@@ -3,6 +3,8 @@
     <h1 class="home_logo">
       <img class="home_logo_img" src="@/assets/images/visit.png"/>
     </h1>
+    <img src="@/assets/images/bg_fish2.png" class="fish2">
+    <img src="@/assets/images/bg_fish1.png" class="fish1">
     <div class="home_body">
       <div class="home_body_middle">
         <div class="home_body_middle_box">
@@ -55,6 +57,7 @@ export default {
 </script>
 <style scoped lang='less'>
 .home {
+  position: relative;
   width: 100vw;
   height: 100vh;
 }
@@ -163,9 +166,11 @@ export default {
 .white {
   background-color: #f5f5f5;
 }
+
 .gray {
   background-color: #7D7979;
 }
+
 .home {
   &_login, &_fri, &_role, &_cgpwd {
     background-color: #dedede;
@@ -196,5 +201,21 @@ export default {
   &_cgpwd {
     width: 8vw;
   }
+}
+
+.fish2 {
+  position: absolute;
+  height: 75%;
+  left: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.fish1 {
+  position: absolute;
+  height: 75%;
+  right: 0px;
+  bottom: 0;
+  overflow: hidden;
 }
 </style>
