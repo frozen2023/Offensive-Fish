@@ -5,6 +5,9 @@
     </h1>
     <img src="@/assets/images/bg_fish2.png" class="fish2">
     <img src="@/assets/images/bg_fish1.png" class="fish1">
+    <img src="@/assets/images/bubble.png" class="bb1">
+    <img src="@/assets/images/bubble2.png" class="bb2">
+    <img src="@/assets/images/bubble2.png" class="bb3">
     <div class="home_body">
       <div class="home_body_middle">
         <div class="home_body_middle_box">
@@ -218,6 +221,27 @@ export default {
   width: 50%;
   right: 0;
   bottom: 0;
+  z-index: -1;
+}
+.bb1 {
+  position: absolute;
+  height: 30%;
+  left: 10vw;
+  bottom: 13vh;
+  z-index: -1;
+}
+.bb2 {
+  position: absolute;
+  height: 30%;
+  left: 25vw;
+  bottom: 3vh;
+  z-index: -1;
+}
+.bb3 {
+  position: absolute;
+  height: 30%;
+  right: 20vw;
+  bottom: 8vh;
   z-index: -1;
 }
 </style>
