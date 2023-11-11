@@ -7,32 +7,32 @@
       <div class="home_body_middle">
         <div class="home_body_middle_box">
           <div class="home_body_middle_out white">
-            <div class="home_body_middle_out_begin">开始游戏</div>
+            <div class="home_body_middle_out_begin" @click="$router.push('/play')">开始游戏</div>
           </div>
         </div>
         <div class="home_body_middle_box">
           <div class="home_body_middle_out gray">
-            <div class="home_body_middle_out_rank">排行榜</div>
+            <div class="home_body_middle_out_rank" @click="$router.push('/rank')">排行榜</div>
           </div>
         </div>
       </div>
       <div class="home_body_aside">
         <div class="home_body_aside_left">
           <div class="home_body_aside_left_login">
-            <button class="home_login">登录</button>
+            <button class="home_login" @click="$router.push('/auth')">登录</button>
           </div>
           <div class="home_body_aside_left_fri">
-            <button class="home_fri">好友</button>
+            <button class="home_fri" @click="$router.push('/friendlist')">好友</button>
           </div>
         </div>
         <div class="home_body_aside_middle">
           <div class="home_body_aside_middle_role">
-            <button class="home_role">角色</button>
+            <button class="home_role" @click="$router.push('/character')">角色</button>
           </div>
         </div>
         <div class="home_body_aside_right">
           <div class="home_body_aside_right_changepwd">
-            <button class="home_cgpwd">修改密码</button>
+            <button class="home_cgpwd" @click="$router.push('/changepwd')">修改密码</button>
           </div>
         </div>
       </div>
