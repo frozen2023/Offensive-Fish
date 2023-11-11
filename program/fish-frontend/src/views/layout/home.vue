@@ -60,11 +60,13 @@ export default {
   position: relative;
   width: 100vw;
   height: 100vh;
+  z-index: 1;
 }
 .home_logo {
   width: 100vw;
   height: 50vh;
   text-align: center;
+  z-index: 1000;
   &_img {
     height: 100%;
   }
@@ -205,17 +207,17 @@ export default {
 
 .fish2 {
   position: absolute;
-  height: 75%;
+  height: 100%;
   left: 0;
   bottom: 0;
-  overflow: hidden;
-  z-index: 0;
+  z-index: -1;
 }
 .fish1 {
   position: absolute;
-  height: 75%;
-  right: 0px;
+  height: 100%;
+  width: 50%;
+  right: 0;
   bottom: 0;
-  overflow: hidden;
+  z-index: -1;
 }
 </style>
