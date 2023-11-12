@@ -8,3 +8,6 @@ https://boardmix.cn/app/share/CAE.CJXtrA0gASoQXySm1km2CdRuWiXLvYKXKjAFQAE/uPPUpF
 
 https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF，
 点击链接加入boardmix中的文件「未命名文件」
+## 11.11   陈浩楠 更新活动图、继续学习MFC  完成任务时长：5h 剩余时间 0h，遇到问题：难以建立框架意识 解决：阅读博客
+
+![活动图](https://github.com/frozen2023/Offensive-Fish/assets/103918091/2399b13c-6531-4a1a-badd-73f43f50a5b5)

@@ -10,6 +10,7 @@ import Rank from '@/views/layout/ranking.vue'
 import loginIndex from '@/views/login/index.vue'
 import Login from '@/views/login/login.vue'
 import Register from '@/views/login/register.vue'
+import Changepwd from '@/views/login/changePwd.vue'
 
 import Play from '@/views/play/index.vue'
 import Room from '@/views/play/createRoom.vue'
@@ -19,6 +20,7 @@ import Game from '@/views/play/game.vue'
 import Settlement from '@/views/play/settlement.vue'
 
 import authUrls from './authUrls.js'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -29,7 +31,7 @@ const routes = [
     redirect: 'home',
     children: [
       { path: 'home', component: Home, name: 'home' },
-      { path: 'friendList', component: friendList, name: 'friendList' },
+      { path: 'friendlist', component: friendList, name: 'friendList' },
       { path: 'character', component: Character, name: 'character' },
       { path: 'rank', component: Rank, name: 'rank' }
     ]
@@ -40,7 +42,8 @@ const routes = [
     redirect: '/login',
     children: [
       { path: '/login', component: Login, name: 'login' },
-      { path: '/register', component: Register, name: 'register'}
+      { path: '/register', component: Register, name: 'register'},
+      { path: '/changepwd', component: Changepwd, name: 'changepwd'}
     ]
   },
   {
@@ -61,20 +64,20 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  if (!authUrls.includes(to.path)) {
-    // 非权限页面，放行
-    next()
-    return
-  }
+// router.beforeEach((to, from, next) => {
+//   if (!authUrls.includes(to.path)) {
+//     // 非权限页面，放行
+//     next()
+//     return
+//   }
 
-  // 权限页面，需要判断token
-  const token = store.getters.token
-  if (token) {
-    next()
-  } else {
-    next('/login')
-  }
-})
+//   // 权限页面，需要判断token
+//   const token = store.getters.token
+//   if (token) {
+//     next()
+//   } else {
+//     next('/login')
+//   }
+// })
 
 export default router

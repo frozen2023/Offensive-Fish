@@ -1,12 +1,12 @@
 <template>
-  <div class="layout">
-    <router-view></router-view>
+  <div class="cgpwd">
+
   </div>
 </template>
 
 <script>
 export default {
-  name: 'layoutIndex',
+  name: 'changePwd',
   components: {},
   data () {
     return {}
@@ -18,10 +18,5 @@ export default {
 }
 </script>
 <style scoped lang='less'>
-.layout {
-  width: 100vw;
-  height: 100vh;
-  background: url('@/assets/images/bg.png') no-repeat;
-  background-size: 100vw 100vh;
-}
+/* @import url(); 引入公共css类 */
 </style>
