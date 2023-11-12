@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 // 1. 获取短信验证码
 export const getMsgCode = (userName) => {
-  return request.get('/User/SendMsg', {
+  return request.get('/User/sendMsg', {
     params: {
       userName
     }
@@ -31,8 +31,9 @@ export const passwordLogin = (userName, passwd) => {
 }
 
 // 4. 注册接口
-export const codeRegistered = (userName, passwd, name, validate) => {
+export const pwdRegistered = (userName, passwd, name, validate) => {
   return request.get('/User/enroll', {
+    withCredentials: true,
     params: {
       userName,
       passwd,
