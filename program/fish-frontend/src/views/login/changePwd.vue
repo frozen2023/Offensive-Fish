@@ -18,7 +18,7 @@
           </div>
           <div class="cgpwd_form_container">
             <label for="repassword" class="cgpwd_form_container_pwdlb">再次确认:</label>
-            <input type="password" id="repassword" class="cgpwd_form_container_pwd re" v-model="passwd" placeholder="请再次输入密码">
+            <input type="password" id="repassword" class="cgpwd_form_container_pwd re" v-model="repasswd" placeholder="请再次输入密码">
           </div>
           <div class="cgpwd_form_container">
             <label for="code" class="cgpwd_form_container_codelb">验证码:</label>
@@ -46,16 +46,76 @@ export default {
     return {
       passwd: '',
       userName: '',
-      name: '',
+      repasswd: '',
       validate: '',
+      verifyCode: '',
       totalSecond: 60, // 总秒数
       second: 60, // 当前秒数，开定时器对 second--
       timer: null, // 定时器 id
     }
   },
   methods: {
+    validFn() {
+      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
+        this.$message.error('请输入正确的手机号')
+        return false
+      }
+      return true
+    },
+    validAll() {
+      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
+        this.$message.error('请输入正确的手机号')
+        return false
+      }
+      if (!/^\w{6,12}$/.test(this.passwd)) {
+        this.$message.error('请输入6-16位密码')
+        return false
+      }
+      if (this.passwd !== this.repasswd) {
+        this.$message.error('两次密码不一致')
+        return false
+      }
+      if (!/^\d{6}$/.test(this.validate)) {
+        this.$message.error('请输入6位验证码')
+        return false
+      }
+      return true
+    },
     async changePwd() {
-      await codeForgetPassword(this.userName, this.passwd, this.validate)
+      if (!this.validAll()) return
+      await codeForgetPassword(this.userName, this.passwd, this.validate, this.verifyCode)
+      .then(res => {
+        this.$message.success('修改成功')
+        this.$router.push('/login')
+      })
+      .catch(err => {
+        this.$message.error('修改失败')
+      })
+    },
+    async getCode() {
+      if (!this.validFn()) {
+        return
+      }
+      // 当前目前没有定时器开着，且 totalSecond 和 second 一致 (秒数归位) 才可以倒计时
+      if (!this.timer && this.second === this.totalSecond) {
+        await getMsgCode(this.userName)
+        .then(res => {
+          this.$message.success('验证码已发送')
+          // 开启倒计时
+          this.verifyCode = res.headers['content-disposition'].split(';')[1].split('=')[1]
+          this.timer = setInterval(() => {
+            this.second--
+            if (this.second <= 0) {
+              clearInterval(this.timer)
+              this.timer = null // 重置定时器 id
+              this.second = this.totalSecond // 归位
+            }
+          }, 1000)
+        })
+        .catch(err => {
+          this.$message.error('验证码发送失败')
+        })
+      }
     }
   }
 }
