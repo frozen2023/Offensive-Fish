@@ -3,8 +3,12 @@
     <h1 class="home_logo">
       <img class="home_logo_img" src="@/assets/images/visit.png"/>
     </h1>
-    <img src="@/assets/images/bg_fish2.png" class="fish2">
-    <img src="@/assets/images/bg_fish1.png" class="fish1">
+    <div class="container1">
+      <img src="@/assets/images/bg_fish1.png" class="fish1">
+    </div>
+    <div class="container2">
+      <img src="@/assets/images/bg_fish2.png" class="fish2">
+    </div>
     <img src="@/assets/images/bubble.png" class="bb1">
     <img src="@/assets/images/bubble2.png" class="bb2">
     <img src="@/assets/images/bubble2.png" class="bb3">
@@ -69,9 +73,10 @@ export default {
   width: 100vw;
   height: 50vh;
   text-align: center;
-  z-index: 1000;
+  z-index: 10;
   &_img {
     height: 100%;
+    scale: 1.3;
   }
 }
 .home_body {
@@ -208,19 +213,37 @@ export default {
   }
 }
 
+.container1, .container2 {
+  position: absolute;
+  bottom: 0;
+  width: 60%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+.container1 {
+  right: 0;
+  width: 60%;
+}
+.container2 {
+  left: 0;
+  width: 50%;
+
+}
 .fish2 {
   position: absolute;
   height: 100%;
+  scale: 1.3;
   left: 0;
-  bottom: 0;
+  bottom: -25%;
   z-index: -1;
 }
 .fish1 {
   position: absolute;
   height: 100%;
-  width: 50%;
-  right: 0;
-  bottom: 0;
+  scale: 1.5;
+  right: 10%;
+  bottom: -10%;
   z-index: -1;
 }
 .bb1 {

@@ -3,7 +3,7 @@ const INFO_KEY = 'user_info'
 
 // 获取个人信息
 export const getInfo = () => {
-  const defaultObj = { satoken: '', loginId: '', userName: '' }
+  const defaultObj = { token: '', loginId: '', userName: '' }
   const result = localStorage.getItem(INFO_KEY)
   return result ? JSON.parse(result) : defaultObj
 }

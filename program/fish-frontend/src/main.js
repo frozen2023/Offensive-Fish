@@ -7,6 +7,8 @@ import store from './store'
 import '@/assets/style/reset.css'
 import '@/assets/style/global.css'
 import '@/assets/style/variable.less'
+// 按需引入 element-ui 组件
+import '@/helper/registerElementComponents.js'
 
 Vue.config.productionTip = false
 
