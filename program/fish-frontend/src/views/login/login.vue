@@ -53,10 +53,17 @@ export default {
       if(!this.validFn()) return
       await passwordLogin(this.userName, this.passwd)
       .then(res => {
-        console.log(res)
-        // const url = this.$route.query.backUrl || '/home'
-        // this.$router.replace(url)
+        const user = res.data.token.data
+        const info = {
+          token: user.tokenValue,
+          loginId: user.loginId,
+          userName: res.data.Name,
+        }
+        this.$store.commit('user/setUserInfo', info)
+        localStorage.setItem('isLogin', true)
         this.$message.success('登录成功')
+        const url = this.$route.query.backUrl || '/home'
+        this.$router.replace(url)
       })
       .catch(err => {
         console.log(err)

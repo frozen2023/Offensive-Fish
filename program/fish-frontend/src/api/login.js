@@ -31,9 +31,12 @@ export const passwordLogin = (userName, passwd) => {
 }
 
 // 4. 注册接口
-export const pwdRegistered = (userName, passwd, name, validate) => {
+export const pwdRegistered = (userName, passwd, name, validate, verifyCode) => {
   return request.get('/User/enroll', {
-    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Verifycode': verifyCode
+    },
     params: {
       userName,
       passwd,

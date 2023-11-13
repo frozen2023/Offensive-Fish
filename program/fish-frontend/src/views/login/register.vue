@@ -48,6 +48,7 @@ export default {
       userName: '',
       name: '',
       validate: '',
+      verifyCode: '',
       totalSecond: 60, // 总秒数
       second: 60, // 当前秒数，开定时器对 second--
       timer: null, // 定时器 id
@@ -56,7 +57,8 @@ export default {
   computed: {},
   methods: {
     async handleReg() {
-      await pwdRegistered(this.userName, this.passwd, this.name, this.validate)
+      if (!this.validAll()) return
+      await pwdRegistered(this.userName, this.passwd, this.name, this.validate, this.verifyCode)
       .then(res => {
         console.log(res)
         this.$message.success('注册成功')
@@ -103,6 +105,7 @@ export default {
         .then(res => {
           this.$message.success('验证码已发送')
           // 开启倒计时
+          this.verifyCode = res.headers['content-disposition'].split(';')[1].split('=')[1]
           this.timer = setInterval(() => {
             this.second--
             if (this.second <= 0) {
