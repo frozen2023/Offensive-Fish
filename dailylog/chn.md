@@ -13,3 +13,4 @@ https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF
 ![活动图](https://github.com/frozen2023/Offensive-Fish/assets/103918091/2399b13c-6531-4a1a-badd-73f43f50a5b5)
 ## 11.12   陈浩楠 学习游戏玩法开发，实现MFC和mysql连接  完成任务时长：6h 剩余时间 0h，遇到问题：无
 
+## 11.13 完成任务：学习mfc，学习设计游戏玩法，任务时长6小时，剩余时间0h，遇到问题:对游戏的设计没有头绪，解决：还没有解决
