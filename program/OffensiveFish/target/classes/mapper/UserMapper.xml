@@ -12,6 +12,7 @@
         values (#{userName},#{passwd},#{name},#{status});
     </insert>
     <update id="updateUserPasswd">
+
         update offensivefish.user
         set passwd=#{passwd}
         where userName=#{userName};

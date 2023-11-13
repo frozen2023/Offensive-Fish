@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public interface UserService {
-    public SaResult login(String userName, String passwd);
+    public Map<String,Object> login(String userName, String passwd);
     public Map<String,Object> changePasswordByTelephone(HttpServletRequest request,String userName,String validate,String passwd);
     public Map<String,Object> enroll(HttpServletRequest request, String userName, String password, String name,String validate);
     public  Map<String,Object> loginOut(String userName);

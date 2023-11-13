@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.offensivefish.mapper.RankListMapper">
+    <select id="selectAllRankList" resultType="com.fish.offensivefish.pojo.RankList">
+        select *from offensivefish.ranklist
+        order by score desc
+    </select>
+    <insert id="insertRankList" parameterType="com.fish.offensivefish.pojo.RankList">
+        insert into offensivefish.ranklist (firstPlayerId, secondPlayerId, score,`rank`, endTime)
+        values (#{firstPlayerId},#{secondPlayerId},#{score},#{rank},#{endTime});
+    </insert>
+    <select id="selectRankListBySelf" resultType="com.fish.offensivefish.pojo.RankList">
+        select *from offensivefish.ranklist
+        where firstPlayerId=#{userName} or secondPlayerId=#{userName}
+    </select>
+    <select id="selectRankListByTwo" resultType="com.fish.offensivefish.pojo.RankList">
+        select *from offensivefish.ranklist
+        where firstPlayerId=#{firstPlayerId} and secondPlayerId=#{secondPlayerId}
+    </select>
+    <delete id="deleteRankList">
+        delete from offensivefish.ranklist
+        where firstPlayerId=#{firstPlayerId} and  secondPlayerId=#{secondPlayerId};
+    </delete>
+    <update id="updateRankList" parameterType="com.fish.offensivefish.pojo.RankList">
+        update offensivefish.ranklist
+        set `rank`=#{rank}
+        where firstPlayerId=#{firstPlayerId} and secondPlayerId=#{secondPlayerId};
+    </update>
+</mapper>

@@ -4,25 +4,28 @@ import cn.dev33.satoken.util.SaResult;
 import com.fish.offensivefish.service.UserService;
 import com.fish.offensivefish.util.SendCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/User")
 public class UserController{
     @Autowired
     UserService userService;
     @RequestMapping("/sendMsg")
-    String sendMsg(HttpServletRequest request, String userName)
+    String sendMsg(HttpServletRequest request, HttpServletResponse response, String userName)
     {
         SendCode sendCode=new SendCode();
-        return sendCode.SendCode(request,userName);
+        return sendCode.SendCode(response,request,userName);
     }
     @RequestMapping("/login")
-    public SaResult login(String userName, String passwd){
+    public Map<String,Object> login(String userName, String passwd){
         return userService.login(userName,passwd);
     }
     @RequestMapping("/changePasswordByTelephone")
