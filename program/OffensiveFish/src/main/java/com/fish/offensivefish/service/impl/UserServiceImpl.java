@@ -16,13 +16,14 @@ import java.util.Map;
 
 import static com.fish.offensivefish.util.AESUtil.parseByte2HexStr;
 import static com.fish.offensivefish.util.AESUtil.parseHexStr2Byte;
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
+
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     UserMapper userMapper;
-    public SaResult login(String userName, String passwd) {
+    public Map<String,Object> login(String userName, String passwd) {
+        Map<String,Object> map=new HashMap<>();
         if(userMapper.selectUser(userName)!=null)
         {       User user=userMapper.selectUser(userName);;
                 byte[] twoStrResult = parseHexStr2Byte(user.getPasswd());
@@ -33,13 +34,16 @@ public class UserServiceImpl implements UserService {
                 {
                     userMapper.updateStatus(1,userName);
                     StpUtil.login(userName);
-                    SaTokenInfo tokenInfo = StpUtil.getTokenInfo();;
-                    return  SaResult.data(tokenInfo);
+                    SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+                    map.put("Name",user.getName());
+                    map.put("token",SaResult.data(tokenInfo));
                 }
-                return  SaResult.error("登入失败，密码输入错误！");
+                else map.put("token",SaResult.error("登入失败，密码输入错误！"));
+                return map;
             }
+        map.put("token",SaResult.error("登入失败，账号输入错误！"));
 
-            return SaResult.error("登入失败，账号输入错误！");
+        return map;
 
 
     }
@@ -64,7 +68,8 @@ public class UserServiceImpl implements UserService {
     }
     public Map<String,Object> enroll(HttpServletRequest request, String userName, String passwd, String name,String validate){
        Map<String,Object> map=new HashMap<>();
-        Object verifyCode=request.getSession().getAttribute("verifyCode");
+        System.out.println(request.getAttribute("Verifycode"));
+        Object verifyCode=request.getHeader("Verifycode");
         System.out.println(verifyCode);
         if(userMapper.selectUser(userName)==null)
         {
