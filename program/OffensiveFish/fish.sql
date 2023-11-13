@@ -54,3 +54,8 @@ insert  into `user` values ('15392287939','D95C03EA19C5D5868A388FB8FEDBB1B6','zz
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS `friendlink`;
+CREATE TABLE friendlink (
+                             onefriendid VARCHAR(50) NOT NULL,
+                             twofriendid VARCHAR(50) NOT NULL
+);
