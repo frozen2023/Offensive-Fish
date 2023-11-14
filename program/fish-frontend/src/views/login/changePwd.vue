@@ -23,7 +23,7 @@
           <div class="cgpwd_form_container">
             <label for="code" class="cgpwd_form_container_codelb">验证码:</label>
             <input type="tel" id="code" class="cgpwd_form_container_code" v-model="validate" placeholder="请输入6位验证码">
-            <button @click="getCode" class="sendmsg">
+            <button @click="getCode()" class="sendmsg">
               {{ second === totalSecond ? '获取验证码' : second + '秒后重新发送'}}
             </button>
           </div>
@@ -38,7 +38,8 @@
 </template>
 
 <script>
-import { codeForgetPassword } from '@/api/login.js'
+import { codeForgetPassword, getMsgCode } from '@/api/login.js'
+import { validChg, validTel } from '@/utils/validate.js'
 export default {
   name: 'changePwd',
   components: {},
@@ -55,45 +56,25 @@ export default {
     }
   },
   methods: {
-    validFn() {
-      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
-        this.$message.error('请输入正确的手机号')
-        return false
-      }
-      return true
-    },
-    validAll() {
-      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
-        this.$message.error('请输入正确的手机号')
-        return false
-      }
-      if (!/^\w{6,12}$/.test(this.passwd)) {
-        this.$message.error('请输入6-16位密码')
-        return false
-      }
-      if (this.passwd !== this.repasswd) {
-        this.$message.error('两次密码不一致')
-        return false
-      }
-      if (!/^\d{6}$/.test(this.validate)) {
-        this.$message.error('请输入6位验证码')
-        return false
-      }
-      return true
-    },
     async changePwd() {
-      if (!this.validAll()) return
-      await codeForgetPassword(this.userName, this.passwd, this.validate, this.verifyCode)
+      if (!validChg(this.userName, this.passwd, this.repasswd, this.validate)) return
+      await codeForgetPassword(this.userName, this.validate, this.passwd, this.verifyCode)
       .then(res => {
-        this.$message.success('修改成功')
-        this.$router.push('/login')
+        if(res.data.msg == '验证码输入错误!') {
+          this.$message.error('验证码输入错误')
+        } else if(res.data.msg == '账号输入错误!') {
+          this.$message.error('账号输入错误!')
+        } else {
+          this.$message.success('修改成功')
+          this.$router.push('/login')
+        }
       })
       .catch(err => {
         this.$message.error('修改失败')
       })
     },
     async getCode() {
-      if (!this.validFn()) {
+      if (!validTel(this.userName)) {
         return
       }
       // 当前目前没有定时器开着，且 totalSecond 和 second 一致 (秒数归位) 才可以倒计时

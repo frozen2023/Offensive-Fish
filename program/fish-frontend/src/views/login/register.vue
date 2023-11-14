@@ -39,6 +39,7 @@
 
 <script>
 import { pwdRegistered, getMsgCode } from '@/api/login.js'
+import { validTel, validReg } from '@/utils/validate.js'
 export default {
   name: 'register',
   components: {},
@@ -57,44 +58,22 @@ export default {
   computed: {},
   methods: {
     async handleReg() {
-      if (!this.validAll()) return
+      if (!validReg(this.userName, this.passwd, this.name, this.validate)) return
       await pwdRegistered(this.userName, this.passwd, this.name, this.validate, this.verifyCode)
       .then(res => {
-        this.$message.success('注册成功')
-        this.$router.push('/login')
+        if(res.data.msg == '验证码输入错误!') {
+          this.$message.error('验证码输入错误')
+        } else {
+          this.$message.success('注册成功')
+          this.$router.push('/login')
+        }
       })
       .catch(err => {
         this.$message.error('注册失败')
       })
     },
-    validFn() {
-      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
-        this.$message.error('请输入正确的手机号')
-        return false
-      }
-      return true
-    },
-    validAll() {
-      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
-        this.$message.error('请输入正确的手机号')
-        return false
-      }
-      if (!/^\w{6,12}$/.test(this.passwd)) {
-        this.$message.error('请输入6-16位密码')
-        return false
-      }
-      if (!/^\w{2,8}$/.test(this.name)) {
-        this.$message.error('请输入2-8位用户名')
-        return false
-      }
-      if (!/^\d{6}$/.test(this.validate)) {
-        this.$message.error('请输入6位验证码')
-        return false
-      }
-      return true
-    },
     async getCode() {
-      if (!this.validFn()) {
+      if (!validTel(this.userName)) {
         return
       }
       // 当前目前没有定时器开着，且 totalSecond 和 second 一致 (秒数归位) 才可以倒计时

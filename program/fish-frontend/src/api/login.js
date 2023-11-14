@@ -47,8 +47,12 @@ export const pwdRegistered = (userName, passwd, name, validate, verifyCode) => {
 }
 
 // 5. 忘记密码接口
-export const codeForgetPassword = (userName, validate, passwd) => {
+export const codeForgetPassword = (userName, validate, passwd, verifyCode) => {
   return request.get('/User/changePasswordByTelephone', {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Verifycode': verifyCode
+    },
     params: {
       userName,
       validate,

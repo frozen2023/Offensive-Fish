@@ -28,6 +28,7 @@
 
 <script>
 import { passwordLogin } from '@/api/login.js'
+import { validLog } from '@/utils/validate.js'
 export default {
   name: 'login',
   components: {},
@@ -38,26 +39,15 @@ export default {
     }
   },
   methods: {
-    validFn() {
-      if (!/^1[3-9]\d{9}$/.test(this.userName)) {
-        this.$message.error('请输入正确的手机号')
-        return false
-      }
-      if (!/^\w{6,12}$/.test(this.passwd)) {
-        this.$message.error('请输入6-12位密码')
-        return false
-      }
-      return true
-    },
     async handleLogin() {
-      if(!this.validFn()) return
+      if(!validLog(this.userName, this.passwd)) return
       await passwordLogin(this.userName, this.passwd)
       .then(res => {
         const user = res.data.token.data
         const info = {
-          token: user.tokenValue,
-          loginId: user.loginId,
-          userName: res.data.Name,
+          token: user.tokenValue || '',
+          loginId: user.loginId || '',
+          userName: res.data.Name || '',
         }
         this.$store.commit('user/setUserInfo', info)
         localStorage.setItem('isLogin', true)
