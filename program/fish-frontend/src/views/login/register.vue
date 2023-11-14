@@ -60,10 +60,8 @@ export default {
       if (!this.validAll()) return
       await pwdRegistered(this.userName, this.passwd, this.name, this.validate, this.verifyCode)
       .then(res => {
-        console.log(res)
         this.$message.success('注册成功')
-        // const url = this.$route.query.backUrl || '/home'
-        // this.$router.replace(url)
+        this.$router.push('/login')
       })
       .catch(err => {
         this.$message.error('注册失败')
