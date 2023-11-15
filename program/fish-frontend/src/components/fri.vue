@@ -120,7 +120,7 @@ export default {
     line-height: 4.5vh;
     width: 20%;
     background-color: rgb(84, 236, 97);
-    .pxfont(26);
+    .pxfont(24);
     text-align: center;
     border-radius: 1vw;
     letter-spacing: 0.1vw;
@@ -145,15 +145,16 @@ export default {
     &_name {
       flex: 1;
       margin-left: 10%;
-      .pxfont(26);
+      .pxfont(24);
       color: rgb(84, 236, 97);
     }
     &_invite {
       margin-right: 5%;
       height: 80%;
+      line-height: 80%;
       width: 20%;
       background-color: #8CB7F3;
-      .pxfont(24);
+      .pxfont(20);
       border-radius: 1vw;
     }
   }
@@ -166,7 +167,7 @@ export default {
     line-height: 4.5vh;
     width: 20%;
     background-color: #189DEE;
-    .pxfont(28);
+    .pxfont(24);
     text-align: center;
     border-radius: 1vw;
     letter-spacing: 0.1vw;
@@ -191,7 +192,7 @@ export default {
     &_name {
       flex: 1;
       margin-left: 10%;
-      .pxfont(26);
+      .pxfont(24);
       color: rgb(146, 150, 146);
     }
   }

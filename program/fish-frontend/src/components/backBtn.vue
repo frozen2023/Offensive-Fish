@@ -22,7 +22,7 @@ export default {
   width: 15vw;
   .pxfont(40);
   border-radius: 1vw;
-  background-color: rgb(28, 65, 187);
+  background-color: rgba(28, 65, 187, 0.7);
   &:hover {
     -webkit-box-shadow: 0.5vh 1vw 2.1vh 0.6vw rgba(76,201,240,1);
     -moz-box-shadow: 0.5vh 1vw 2.1vh 0.6vw rgba(76,201,240,1);

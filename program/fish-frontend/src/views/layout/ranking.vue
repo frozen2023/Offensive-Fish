@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { getRankList } from '@/api/rank.js'
 export default {
   name: 'ranking',
   components: {},
@@ -51,9 +52,21 @@ export default {
     }
   },
   methods: {
-    
+    async getRank() {
+      await getRankList()
+      .then(res => {
+        console.log(res)
+        this.$message.success('获取排行榜成功')
+      })
+      .catch(err => {
+        console.log(err)
+        this.$message.error('获取排行榜失败')
+      })
+    }
   },
-  created () {},
+  created () {
+    this.getRank()
+  },
 }
 </script>
 <style scoped lang='less'>
