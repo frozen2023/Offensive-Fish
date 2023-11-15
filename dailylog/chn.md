@@ -16,3 +16,5 @@ https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF
 ## 11.13 完成任务：学习mfc，学习设计游戏玩法，任务时长6小时，剩余时间0h，遇到问题:对游戏的设计没有头绪，解决：还没有解决
 
 ## 11.14 陈浩楠 学习Qt，学习游戏策划
+
+## 11.15 陈浩楠 学习Qt，学习游戏策划
