@@ -13,5 +13,5 @@ public class RankList {
     String secondPlayerId;
     int score;//得分
     int rank;//排名
-    String endTime;
+    String endTime;//生成时间
 }

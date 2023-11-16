@@ -26,21 +26,21 @@ public class UserServiceImpl implements UserService {
         Map<String,Object> map=new HashMap<>();
         if(userMapper.selectUser(userName)!=null)
         {       User user=userMapper.selectUser(userName);;
-            byte[] twoStrResult = parseHexStr2Byte(user.getPasswd());
-            System.out.println("二进制"+twoStrResult);
-            byte[] password1=AESUtil.decrypt(twoStrResult,"password123");
-            String pwd=new String(password1);
-            if(pwd.equals(passwd))
-            {
-                userMapper.updateStatus(1,userName);
-                StpUtil.login(userName);
-                SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-                map.put("Name",user.getName());
-                map.put("token",SaResult.data(tokenInfo));
+                byte[] twoStrResult = parseHexStr2Byte(user.getPasswd());
+                System.out.println("二进制"+twoStrResult);
+                byte[] password1=AESUtil.decrypt(twoStrResult,"password123");
+                String pwd=new String(password1);
+                if(pwd.equals(passwd))
+                {
+                    userMapper.updateStatus(1,userName);
+                    StpUtil.login(userName);
+                    SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+                    map.put("Name",user.getName());
+                    map.put("token",SaResult.data(tokenInfo));
+                }
+                else map.put("token",SaResult.error("登入失败，密码输入错误！"));
+                return map;
             }
-            else map.put("token",SaResult.error("登入失败，密码输入错误！"));
-            return map;
-        }
         map.put("token",SaResult.error("登入失败，账号输入错误！"));
 
         return map;
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         return msg;
     }
     public Map<String,Object> enroll(HttpServletRequest request, String userName, String passwd, String name,String validate){
-        Map<String,Object> map=new HashMap<>();
+       Map<String,Object> map=new HashMap<>();
         System.out.println(request.getAttribute("Verifycode"));
         Object verifyCode=request.getHeader("Verifycode");
         System.out.println(verifyCode);
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
                 user.setPasswd(hexStrResult);
                 userMapper.insertUser(user);
                 map.put("msg","注册成功！");
-            }
+           }
             else map.put("msg","验证码输入错误!");
         }
         else map.put("msg","该账号已经注册");
