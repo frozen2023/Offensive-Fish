@@ -58,7 +58,7 @@
     <h3>SocketClient发送消息</h3>
     <div style="border: 1px;">
         <label>socketEvent名称:</label><input type="text" id="socketEvent">
-        <input type="text" id="roomId">
+        <label>房间号名称:</label> <input type="text" id="roomId">
         <br><br>
         <textarea  id="content" maxlength="1000" cols="40" rows="5" placeholder="请输入内容"></textarea>
         <button id="send" style="width: 100px;">发送消息</button>
@@ -85,22 +85,19 @@
     //连接
     function connect(url) {
 
-        //var opts = {
-        //    query: 'userId='+userId
-        //};
+
+
         //socket = io.connect(url, opts);
-
         socket = io.connect(url);
-
+        // socket.nsp="/test"
         //socket.nsp = "/test";//定义命名空间
-
         console.log(socket)
-
         //监听本次连接回调函数
         socket.on('connect', function () {
             isConnected =true;
             console.log("连接成功");
-            serverOutput('<span class="connect-msg"><font color="blue">'+getNowTime()+'&nbsp;</font>连接成功</span>');
+            console.log("连接成功");
+            serverOutput('<span class="connect-msg"><font color="blue">'+getNowTime()+'&nbsp;</font>+连接成功</span>');
             errorCount=0;
         });
         //监听消息
@@ -187,6 +184,12 @@
         var roomId=$("#roomId").val()
         if(socketEvent==="sendRoomMessage"){
             socket.emit(socketEvent,roomId,content,function(data1,data2){
+                console.log("ack1:"+data1);
+                console.log("ack2:"+data2);
+            });
+        }
+        else if(socketEvent==="joinRoom"){
+            socket.emit(socketEvent,roomId,function(data1,data2){
                 console.log("ack1:"+data1);
                 console.log("ack2:"+data2);
             });

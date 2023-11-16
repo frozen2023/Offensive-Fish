@@ -8,6 +8,8 @@ import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fish.offensivefish.Cache.ClientCache;
+import com.fish.offensivefish.mapper.UserMapper;
+import com.fish.offensivefish.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,16 +23,18 @@ public class RoomHandler {
     //加入房间
     @Autowired
     private SocketIOServer socketIoServer;
+    @Autowired
+    UserMapper userMapper;
     @OnEvent("joinRoom")
     public void joinRoom(SocketIOClient client, int roomId, AckRequest ackRequest) throws JsonProcessingException {
         String roomId1= String.valueOf(roomId);
         client.joinRoom(roomId1);
-        String userId=client.getHandshakeData().getSingleUrlParam("userId");
-
+//        String userId=client.getHandshakeData().getSingleUrlParam("userId");
+//        User user=userMapper.selectUser(userId);
         System.out.println("加入房间");
         if(ackRequest.isAckRequested()){
             //返回给客户端，说我接收到了
-            ackRequest.sendAckData("加入房间","成功");
+            ackRequest.sendAckData("加入房间","!");
         }
 
     }
@@ -60,8 +64,6 @@ public class RoomHandler {
             }
 
         }
-
-
 
         if(ackRequest.isAckRequested()){
             //返回给客户端，说我接收到了

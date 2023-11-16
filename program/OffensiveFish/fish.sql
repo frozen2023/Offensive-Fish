@@ -54,8 +54,37 @@ insert  into `user` values ('15392287939','D95C03EA19C5D5868A388FB8FEDBB1B6','zz
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS `ranklist`;
+
+CREATE TABLE `ranklist` (
+                            `firstPlayerId` varchar(20) NOT NULL COMMENT '第一个玩家',
+                            `secondPlayerId` varchar(20) NOT NULL COMMENT '第二个玩家',
+                            `score` int NOT NULL COMMENT '得分',
+                            `rank` int NOT NULL COMMENT '排名',
+                            `endTime` varchar(20) NOT NULL COMMENT '生成时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
 DROP TABLE IF EXISTS `friendlink`;
 CREATE TABLE friendlink (
                              onefriendid VARCHAR(50) NOT NULL,
                              twofriendid VARCHAR(50) NOT NULL
+);
+DROP TABLE IF EXISTS room;
+CREATE TABLE room (
+                      roomid int NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                      roomownerid VARCHAR(20) NOT NULL ,
+                      playerid VARCHAR(20) ,
+                      code VARCHAR(20) NOT NULL ,
+                      numbers int NOT NULL,
+                      isopen int NOT NULL
+);
+ALTER TABLE room AUTO_INCREMENT=10001;
+DROP TABLE IF EXISTS game;
+CREATE TABLE game (
+                      roomName int,
+                      gameId  int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                      runTime Date,
+                      firstPlayerId VARCHAR(20),
+                      secondPlayerId VARCHAR(20),
+                      score int
 );

@@ -1,11 +1,14 @@
 package com.fish.offensivefish.service.impl;
 
 import com.fish.offensivefish.mapper.FriendLinkMapper;
+import com.fish.offensivefish.mapper.UserMapper;
+import com.fish.offensivefish.pojo.Friend;
 import com.fish.offensivefish.pojo.FriendLink;
 import com.fish.offensivefish.service.FriendLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,8 @@ import java.util.Map;
 public class FriendLinkServiceImpl implements FriendLinkService {
     @Autowired
     FriendLinkMapper friendLinkMapper;
+    @Autowired
+    UserMapper userMapper;
     public Map<String,Object> addFriendLink(String oneFriendId, String twoFriendId){
         Map<String,Object> msg=new HashMap<>();
         FriendLink friendLink = new FriendLink();
@@ -40,31 +45,43 @@ public class FriendLinkServiceImpl implements FriendLinkService {
         }
         return msg;
     }
-    public Map<String, FriendLink> selectAllFriend(String userName){
-        Map<String, FriendLink> friendMap = new HashMap<>();
+    public List<Friend> selectAllFriend(String userName){
         List<FriendLink> friendLinks=friendLinkMapper.selectAll(userName);
-        if(friendLinks.size()==0)
-            friendMap.put("暂无好友", null);
-        else
+        List<Friend> friends=new ArrayList<>();
+        if(friendLinks==null)
+            friends=null;
+        else {
             for (int i = 0; i < friendLinks.size(); i++) {
-                if(friendLinks.get(i).getOneFriendId().equals(userName))
-                    friendMap.put(friendLinks.get(i).getTwoFriendId(),friendLinks.get(i));
-                else
-                    friendMap.put(friendLinks.get(i).getOneFriendId(),friendLinks.get(i));
+                Friend friend=new Friend();
+                if(friendLinks.get(i).getOneFriendId().equals(userName)){
+                    friend.setName(userMapper.selectUser(friendLinks.get(i).getTwoFriendId()).getName());
+                    friend.setStatus(userMapper.selectUser(friendLinks.get(i).getOneFriendId()).getStatus());
+                }
+               else {
+                    friend.setName(userMapper.selectUser(friendLinks.get(i).getOneFriendId()).getName());
+                    friend.setStatus(userMapper.selectUser(friendLinks.get(i).getTwoFriendId()).getStatus());
+                }
+                System.out.println(friend);
+                friends.add(friend);
             }
-        return friendMap;
+        }
+        return friends;
     }
-    public FriendLink selectOneFriend(String userName,String friendId){
-        Map<String, FriendLink> friendMap = new HashMap<>();
+    public Friend selectOneFriend(String userName,String friendId){
         FriendLink friendLink=new FriendLink();
         friendLink.setOneFriendId(userName);
         friendLink.setTwoFriendId(friendId);
         FriendLink f=friendLinkMapper.selectOne(friendLink);
-        if(f==null)
-            friendMap.put("无该好友",null);
-        else
-            friendMap.put(friendId,f);
-        return f;
+        Friend friend=new Friend();
+        if(f.getOneFriendId().equals(userName)){
+            friend.setName(userMapper.selectUser(f.getTwoFriendId()).getName());
+            friend.setStatus(userMapper.selectUser(f.getOneFriendId()).getStatus());
+        }
+        else {
+            friend.setName(userMapper.selectUser(f.getOneFriendId()).getName());
+            friend.setStatus(userMapper.selectUser(f.getTwoFriendId()).getStatus());
+        }
+        return friend;
     }
     public Map<String,Object> inviteFriend(String friendId){
         return null;
