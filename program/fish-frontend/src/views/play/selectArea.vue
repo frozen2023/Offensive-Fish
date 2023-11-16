@@ -7,14 +7,16 @@
       <div class="area_body_left" @click="left()">
         <div class="area_body_left_arrow"></div>
       </div>
-      <div class="area_body_map" v-for="(map, index) in displayedMaps" :key="index">{{ map.name }}</div>
+      <div class="area_body_map" v-for="(map) in displayedMaps" :key="map.id" @click="slected(map.id)">{{ map.name }}
+        <i class="slected" v-show="map.slected">已选择</i>
+      </div>
       <div class="area_body_right" @click="right()">
         <div class="area_body_right_arrow"></div>
       </div>
     </div>
     <div class="area_foot">
-      <button class="area_foot_confirm">确认选择</button>
-      <button class="area_foot_return">返回</button>
+      <button class="area_foot_confirm" @click="confirm()">{{  hasSlection?'确认选择':'随机选择' }}</button>
+      <button class="area_foot_return" @click="doBack()">返回</button>
     </div>
   </div>
 </template>
@@ -25,10 +27,11 @@ export default {
   data () {
     return {
       maps: [
-        { id: 1, name: '1' },
-        { id: 2, name: '2' },
-        { id: 3, name: '3' },
-        { id: 4, name: '4' }
+        { id: 1, name: '1', slected: false },
+        { id: 2, name: '2', slected: false },
+        { id: 3, name: '3', slected: false },
+        { id: 4, name: '4', slected: false },
+        { id: 5, name: '5', slected: false }
       ],
       currentIndex: 0, // 当前展示地图数组的索引
       displayCount: 3 // 每次展示的地图数量
@@ -36,21 +39,53 @@ export default {
   },
   computed: {
     displayedMaps() {
-      const endIndex = this.currentIndex + this.displayCount;
-      return this.maps.slice(this.currentIndex, endIndex);
+      const endIndex = this.currentIndex + this.displayCount
+      return this.maps.slice(this.currentIndex, endIndex)
+    },
+    hasSlection() {
+      return this.maps.some((item) => {
+        return item.slected
+      })
+    },
+    slection() {
+      return this.maps.filter((item) => {
+        return item.slected
+      })
     }
   },
   watch: {},
   methods: {
     left() {
       if (this.currentIndex > 0) {
-        this.currentIndex--;
+        this.currentIndex--
       }
     },
     right() {
       if (this.currentIndex < this.maps.length - this.displayCount) {
-        this.currentIndex++;
+        this.currentIndex++
       }
+    },
+    slected(id) {
+      this.maps.forEach((item) => {
+        if (item.id === id) {
+          item.slected = true
+        } else {
+          item.slected = false
+        }
+      })
+    },
+    doBack() {
+
+    },
+    confirm() {
+      let mapId = ''
+      if(!this.hasSlection) {
+        const index = Math.floor(Math.random() * this.maps.length)
+        mapId = this.maps[index].id
+      } else {
+        mapId = this.slection[0].id
+      }
+      this.$router.push({ path: '/role', query: { mapid: mapId } })
     }
   },
   created () {},
@@ -113,12 +148,26 @@ export default {
       }
     }
     &_map {
+      position: relative;
       margin-right: 4vw;
       height: 45vh;
       width: 45vh;
       background-color: red;
+      cursor: pointer;
       &:nth-child(4) {
         margin-right: 0;
+      }
+      .slected {
+        position: absolute;
+        right: -5vh;
+        top: -5vh;
+        height: 10vh;
+        line-height: 10vh;
+        width: 10vh;
+        border-radius: 50%;
+        background-color: #fff;
+        text-align: center;
+        .pxfont(22);
       }
     }
   }
