@@ -29,34 +29,34 @@ public class RankListServiceImpl implements RankListService {
         }
         else {
             map.put("msg", "插入成功");
-            RankList rank1=rankListMapper.selectRankListByTwo(rank.getFirstPlayerId(),rank.getSecondPlayerId());
-            for(int i=0;i<rankList.size();i++)
-            {
-                if(rank1!=null&&rank1.getScore()<rank.getScore()){
-                    rankListMapper.deleteRankList(rank.getFirstPlayerId(),rank.getSecondPlayerId());
-                    rankListMapper.insertRankList(rank);
-                    break;
-                }
-                else if(rank1==null){
-                    rankListMapper.insertRankList(rank);
-                    break;
+        RankList rank1=rankListMapper.selectRankListByTwo(rank.getFirstPlayerId(),rank.getSecondPlayerId());
+        for(int i=0;i<rankList.size();i++)
+        {
+            if(rank1!=null&&rank1.getScore()<rank.getScore()){
+                rankListMapper.deleteRankList(rank.getFirstPlayerId(),rank.getSecondPlayerId());
+                rankListMapper.insertRankList(rank);
+                break;
+            }
+            else if(rank1==null){
+                rankListMapper.insertRankList(rank);
+                break;
+            }
+        }
+        List<RankList> rankLists=rankListMapper.selectAllRankList();
+        for(int i=0;i<rankLists.size();i++){
+            for(int j=i;j<rankLists.size()-1;j++){
+                if(rankLists.get(j).getScore()<rankLists.get(j+1).getScore()){
+                    RankList temp=rankLists.get(j+1);
+                    rankLists.set(j+1,rankLists.get(j));
+                    rankLists.set(j,temp);
                 }
             }
-            List<RankList> rankLists=rankListMapper.selectAllRankList();
-            for(int i=0;i<rankLists.size();i++){
-                for(int j=i;j<rankLists.size()-1;j++){
-                    if(rankLists.get(j).getScore()<rankLists.get(j+1).getScore()){
-                        RankList temp=rankLists.get(j+1);
-                        rankLists.set(j+1,rankLists.get(j));
-                        rankLists.set(j,temp);
-                    }
-                }
-            }
-            for(int i=0;i<rankLists.size();i++){
-                rankLists.get(i).setRank(i+1);
-                System.out.println("rank: "+i+1+"       "+rankLists.get(i));
-                rankListMapper.updateRankList(rankLists.get(i));
-            }
+        }
+        for(int i=0;i<rankLists.size();i++){
+            rankLists.get(i).setRank(i+1);
+            System.out.println("rank: "+i+1+"       "+rankLists.get(i));
+            rankListMapper.updateRankList(rankLists.get(i));
+        }
         }
 //
 //        System.out.println(rankList.size());
@@ -112,7 +112,7 @@ public class RankListServiceImpl implements RankListService {
 //                }
 //            }
 //        }
-        return map;
+            return map;
     }
     public List<RankList> selectRankListBySelf(String userName){
         return rankListMapper.selectRankListBySelf(userName);

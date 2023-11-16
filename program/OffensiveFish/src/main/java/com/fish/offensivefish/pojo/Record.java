@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FriendLink {
-    String oneFriendId;//好友是双向的，不用多填
-    String twoFriendId;
+public class Record{
+    int rank;
+    int score;
+    int gameId;
+    String firstPlayer;
+    String secondPlayer;
 }
