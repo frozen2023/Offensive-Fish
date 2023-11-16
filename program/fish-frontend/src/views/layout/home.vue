@@ -128,7 +128,6 @@ export default {
         -moz-box-shadow: 0.5vh 1vw 2.1vh 0.6vw rgba(76,201,240,1);
         box-shadow: 0.5vh 0.5vw 8.1vh 0.5vw rgba(76,201,240,1);
         transition: all 0.25s linear;
-        font-size: 42px;
         transform: scale(1.05);
       }
     }

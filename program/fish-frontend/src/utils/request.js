@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import store from '@/store'
 import axios from 'axios'
 // import { showFullScreenLoading , tryHideFullScreenLoading } from '@/utils/loading.js'
@@ -31,7 +32,7 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (res) {
   // 2xx 范围内的状态码都会触发该函数。
   // 对响应数据做点什么 (默认axios会多包装一层data，需要响应拦截器中处理一下)
-  console.log(res, 666)
+  console.log(res,666)
   if (res.status !== 200) {
     // tryHideFullScreenLoading()
     Vue.prototype.$message({

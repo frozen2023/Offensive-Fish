@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.offensivefish.mapper.GameMapper">
+    <select id="SelectGameById" resultType="com.fish.offensivefish.pojo.Game">
+        select *from offensivefish.game
+        where gameId= #{GameId}
+    </select>
+    <insert id="InsertGame" parameterType="com.fish.offensivefish.pojo.Game">
+        insert into offensivefish.game (roomName,runTime,firstPlayerId,secondPlayerId,score)
+        values (#{roomName},#{runTime},#{firstPlayerId},#{secondPlayerId},#{score});
+    </insert>
+    <delete id="DeleteGame" parameterType="com.fish.offensivefish.pojo.Game">
+        delete from offensivefish.game
+        where gameId= #{gameId}
+    </delete>
+</mapper>
