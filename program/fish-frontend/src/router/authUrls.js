@@ -1,9 +1,10 @@
 const authUrls =  [
   // layout
-  '/friendList',
+  '/friendlist',
   '/rank',
 
   // play
+  '/play',
   '/room',
   '/area',
   '/role',
