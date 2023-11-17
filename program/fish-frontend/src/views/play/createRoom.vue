@@ -24,11 +24,12 @@
           </div>
           <div class="creation_player_other">
             <div class="creation_player_status" :style="player.status?ready:noready"></div>
-            <div class="creation_player_name">{{ '等待中...'||player.name }}</div>
+            <div class="creation_player_name">{{ player.name||'等待中...' }}</div>
           </div>
         </div>
         <div class="creation_btnbox">
-          <button class="begin">开始</button>
+          <button class="begin" @click="begin()" v-if="isMaster">开始</button>
+          <button class="ready" @click="readying($event)" v-else>{{ player.status?'已准备':'准备' }}</button>
           <button class="return" @click="$router.push('/home')">返回</button>
         </div>
       </div>
@@ -56,6 +57,7 @@ export default {
         backgroundColor: 'red'
       },
       code: 'vivo50',
+      isMaster: true,
       master: {
         name: 'xh懒觉大支',
         status: true
@@ -68,7 +70,19 @@ export default {
   },
   computed: {},
   watch: {},
-  methods: {},
+  methods: {
+    begin() {
+      this.$router.push('/area')
+    },
+    readying(e) {
+      this.player.status = !this.player.status
+      if (this.player.status) {
+        e.target.style.backgroundColor = '#629DF4'
+      } else {
+        e.target.style.backgroundColor = '#F4A962'
+      }
+    }
+  },
   created () {},
 }
 </script>
@@ -184,7 +198,7 @@ export default {
     align-items: center;
     height: 10vh;
     width: 100%;
-    .begin, .return {
+    .begin, .return, .ready {
       height: 70%;
       width: 20%;
       background-color: #629DF4;
@@ -198,8 +212,11 @@ export default {
         transform: scale(1.05);
       }
     }
-    .begin {
+    .begin, .ready {
       margin-right: 8vw;
+    }
+    .ready {
+      background-color: #F4A962;
     }
   }
 }
