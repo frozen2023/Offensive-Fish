@@ -33,10 +33,16 @@
       </div>
       <div class="role_right_chatwrap">
         <div class="role_right_chatwrap_chat">
-          <div class="chat_wrap"></div>
+          <div class="chat_wrap">
+            <ul class="chat_list" ref="chatList">
+              <li v-for="(message, index) in chatMessages" :key="index" :class="message.position">
+                <span>{{ message.text }}</span>
+              </li>
+            </ul>
+          </div>
           <div class="chat_ipt">
-            <input type="text">
-            <button class="send()">发送</button>
+            <input type="text" placeholder="说点什么吧" v-model="sendText" @keyup.enter="sendMsg()">
+            <button @click="sendMsg()">发送</button>
           </div>
         </div>
       </div>
@@ -63,6 +69,11 @@ export default {
       timer: null, // 定时器 id
       text: '游戏即将开始',
       nowId: 1, // 当前页面玩家id
+      sendText: '',
+      chatMessages: [
+        { position: 'left', text: '小宝贝', id: 1 },
+        { position: 'right', text: '干嘛', id: 2 },
+      ]
     }
   },
   computed: {
@@ -96,9 +107,13 @@ export default {
         }
       })
     },
-    send() {
-
-    }
+    sendMsg() {
+      this.chatMessages.push({
+        text: this.sendText,
+        position: 'right' // 添加消息的位置，你可以根据需要调整
+      })
+      this.sendText = '' // 清空发送文本框
+    },
   },
   created () {
     if (!this.timer && this.second === this.totalSecond) {
@@ -274,6 +289,11 @@ export default {
     height: 88%;
     width: 100%;
     // background-color: red;
+    padding: 1vw;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   &_ipt {
     display: flex;
@@ -285,24 +305,55 @@ export default {
     // background-color: blue;
     input {
       margin-right: 5%;
-      height: 90%;
+      height: 80%;
       width: 60%;
       border: none;
       outline: none;
       border-radius: 1vw;
       padding: 0 1vw;
-      .pxfont(28);
+      .pxfont(24);
     }
     button {
-      height: 90%;
+      height: 80%;
       width: 20%;
       border: none;
       outline: none;
       border-radius: 1vw;
       background-color: #056DA6;
-      .pxfont(28);
+      .pxfont(26);
       color: #000;
     }
   }
+}
+li {
+  display: flex;
+  align-items: top;
+}
+li~li {
+  /* 除了第一个li, 选择所有的兄弟li标签 */
+  margin-top: 1vh;
+}
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+.left span {
+  margin-left: 1vw;
+  border-radius: 0.1vw 0.5vw 0.1vw 0.5vw;
+  display: inline-block;
+  padding: 1.1vh 0.8vw;
+  background-color: #3374d6;
+  color: #FFFFFF;
+  .pxfont(20);
+}
+.right span {
+  margin-right: 1vw;
+  border-radius: 0.1vw 0.5vw 0.1vw 0.5vw;
+  display: inline-block;
+  padding: 1.1vh 0.8vw;
+  background: #FFFFFF;
+  border: 0.1vw solid rgba(247, 247, 247, 1);
+  color: #000000;
+  .pxfont(20);
 }
 </style>
