@@ -26,24 +26,12 @@
 </template>
 
 <script>
+import { getFriendList } from '@/api/friend.js'
 export default {
   name: 'f',
   data () {
     return {
       friList: [
-        { id: 1, nickName: '玩家1', isOnline: true },
-        { id: 2, nickName: '玩家2', isOnline: true },
-        { id: 3, nickName: '玩家3', isOnline: false },
-        { id: 4, nickName: '玩家4', isOnline: true },
-        { id: 5, nickName: '玩家5', isOnline: false },
-        { id: 6, nickName: '玩家6', isOnline: true },
-        { id: 7, nickName: '玩家7', isOnline: false },
-        { id: 8, nickName: '玩家8', isOnline: true },
-        { id: 9, nickName: '玩家9', isOnline:false },
-        { id: 10, nickName: '玩家10', isOnline: true },
-        { id: 11, nickName: '玩家11', isOnline: false },
-        { id: 12, nickName: '玩家12', isOnline: true },
-        { id: 13, nickName: '玩家13', isOnline:false },
       ],
     }
   },
@@ -69,11 +57,18 @@ export default {
 
     },
     async getFriList() {
-
+      await getFriendList().then((res) => {
+        console.log(res)
+        this.$message.success('获取好友列表成功')
+      })
+      .catch((err) => {
+        console.log(err)
+        this.$message.error('获取好友列表失败')
+      })
     }
   },
   created () {
-    // this.getFriList()
+    this.getFriList()
   },
 }
 </script>

@@ -8,6 +8,9 @@ export default new Vuex.Store({
   getters: {
     token (state) {
       return state.user.userInfo.token
+    },
+    loginId (state) {
+      return state.user.userInfo.loginId
     }
   },
   modules: {
