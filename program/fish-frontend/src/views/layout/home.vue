@@ -16,7 +16,7 @@
       <div class="home_body_middle">
         <div class="home_body_middle_box">
           <div class="home_body_middle_out white">
-            <div class="home_body_middle_out_begin" @click="$router.push('/play')">开始游戏</div>
+            <div class="home_body_middle_out_begin" @click="goPlay()">开始游戏</div>
           </div>
         </div>
         <div class="home_body_middle_box">
@@ -52,13 +52,20 @@
 <script>
 export default {
   name: 'home',
-  components: {},
   data () {
     return {}
   },
   computed: {},
-  watch: {},
-  methods: {},
+  methods: {
+    goPlay() {
+      this.$router.push({
+        path: '/room',
+        query: {
+          type: 'create'
+        }
+      })
+    }
+  },
   created () {},
 }
 </script>

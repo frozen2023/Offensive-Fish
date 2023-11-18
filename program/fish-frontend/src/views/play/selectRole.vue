@@ -19,7 +19,7 @@
       <div class="role_body">
         <div class="role_wrap" v-for="(role,index) in roles" :key="index" @click="choose(index)">
           <i class="slected" v-show="role.slected" ref="slectedLable">已选择</i>
-          <div class="role_wrap_img"></div>
+          <div class="role_wrap_img"><img :src="role.img" alt=""></div>
           <div class="role_wrap_name">{{ role.name }}</div>
           <div class="role_wrap_desc">{{ role.desc }}</div>
           <div class="role_wrap_ability">{{ role.ability }}</div>
@@ -61,8 +61,8 @@ export default {
         { id: 2, name: 'XH懒觉小支', master: true, pos: 'P2', selection: '' },
       ],
       roles: [
-        { slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
-        { slected: false, name: '鳐鱼', desc: '变异之处：这种鳐鱼由于核污染而发光，身体覆盖着发光的鳞片。它们的扁平体形使它们擅长在海底滑行，并且拥有特殊的治疗能力。', ability: '特殊能力：光线鳐鱼可以发出闪亮的光束，使周围的水域一片明亮。这可以用来吸引其他鱼，使猎食更容易。此外，它可以治疗他的小伙伴。' }
+        { img: require('@/assets/images/1.png'), slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
+        { img: require('@/assets/images/2.png'), slected: false, name: '鳐鱼', desc: '变异之处：这种鳐鱼由于核污染而发光，身体覆盖着发光的鳞片。它们的扁平体形使它们擅长在海底滑行，并且拥有特殊的治疗能力。', ability: '特殊能力：光线鳐鱼可以发出闪亮的光束，使周围的水域一片明亮。这可以用来吸引其他鱼，使猎食更容易。此外，它可以治疗他的小伙伴。' }
       ],
       totalSecond: 20, // 总秒数
       second: 20, // 当前秒数，开定时器对 second--
@@ -215,6 +215,9 @@ export default {
     &_img {
       height: 50%;
       width: 100%;
+      img {
+        width: 100%;
+      }
     }
     &_name {
       height: 6.4vh;

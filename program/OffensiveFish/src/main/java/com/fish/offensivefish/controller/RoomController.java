@@ -35,4 +35,8 @@ public class RoomController {
     public Map<String,Object> ExitRoom(int roomId){
         return roomService.ExitRoom(roomId);
     }
+    @RequestMapping("/getRoomId")
+    public int getRoomId(String code){
+        return roomService.getRoomId(code);
+    }
 }

@@ -47,7 +47,7 @@ spring:
 #自定义socketio配置,你可以直接硬编码，看个人喜好
 socketio:
   # socketio请求地址
-  host: 10.194.4.46
+  host: localhost
   # socketio端口
   port: 9999
   # 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器

@@ -3,7 +3,9 @@
     <div class="character_left">
       <div class="character_left_card" v-for="(role, index) in roles" :key="role.id" @click="choose(role.id, index)">
         <div class="card_wrap" ref="roleTab" :style="role.isSelected ? tabSelecte : tabNotSelect">
-          <div class="card_wrap_img"></div>
+          <div class="card_wrap_img">
+            <img :src="role.img" alt="">
+          </div>
           <div class="card_wrap_name">{{ role.name }}</div>
         </div>
       </div>
@@ -140,6 +142,9 @@ export default {
     &_img {
       height: 77%;
       width: 100%;
+      img {
+        width: 100%
+      }
     }
     &_name {
       .pxfont(30);

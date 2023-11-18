@@ -1,7 +1,9 @@
 import request from '@/utils/request.js'
+import store from '@/store'
 
 // 1.获取好友列表接口
-export const getFriendList = (userName) => {
+export const getFriendList = () => {
+  const userName = store.getters.loginId
   return request.get('/FriendLink/selectAllFriend', {
     params: {
       userName

@@ -11,6 +11,10 @@
         select *from offensivefish.room
         where roomid= #{RoomId}
     </select>
+    <select id="selectRoomByCode" resultType="java.lang.Integer">
+        select roomid from offensivefish.room
+        where code= #{code}
+    </select>
     <select id="selectAllRoom" resultType="com.fish.offensivefish.pojo.Room">
         select *from offensivefish.room
     </select>

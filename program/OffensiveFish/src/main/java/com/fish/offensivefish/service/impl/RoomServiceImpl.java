@@ -84,6 +84,8 @@ public class RoomServiceImpl implements RoomService {
     }//进入房间，进入后房间人数自增1
     public Map<String,Object> ExitRoom(int roomId) {
         Map<String,Object> map=new HashMap<>();
+        System.out.println(roomId);
+        System.out.println(roomMapper.selectRoomById(roomId));
         if(roomMapper.selectRoomById(roomId).getNumbers()==1){
             roomMapper.deleteRoom(roomId);
             map.put("msg", "房间销毁");
@@ -94,4 +96,8 @@ public class RoomServiceImpl implements RoomService {
         }
         return map;
     }//退出房间，退出后房间人数减一，此时房间可以进入
+
+    public int getRoomId(String code) {
+        return roomMapper.selectRoomByCode(code);
+    }
 }
