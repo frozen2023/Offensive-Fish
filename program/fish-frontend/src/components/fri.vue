@@ -59,11 +59,14 @@ export default {
     async getFriList() {
       await getFriendList().then((res) => {
         console.log(res)
-        this.$message.success('获取好友列表成功')
       })
       .catch((err) => {
         console.log(err)
-        this.$message.error('获取好友列表失败')
+        this.$message({
+          message: '获取好友列表失败',
+          type: 'error',
+          duration: 1000
+        })
       })
     }
   },
