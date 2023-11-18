@@ -29,15 +29,12 @@ public class RoomHandler {
     public void joinRoom(SocketIOClient client, int roomId, AckRequest ackRequest) throws JsonProcessingException {
         String roomId1= String.valueOf(roomId);
         client.joinRoom(roomId1);
-        String userId=client.getHandshakeData().getSingleUrlParam("userId");
 //        String userId=client.getHandshakeData().getSingleUrlParam("userId");
 //        User user=userMapper.selectUser(userId);
         System.out.println("加入房间");
         if(ackRequest.isAckRequested()){
             //返回给客户端，说我接收到了
-            ackRequest.sendAckData(userId,"进入房间成功!");
-            //返回加入房间人的id；
-            socketIoServer.getRoomOperations(roomId1).sendEvent("entryRoom",userId);
+            ackRequest.sendAckData("加入房间","!");
         }
 
     }
@@ -59,7 +56,7 @@ public class RoomHandler {
         Set<String> allRooms = client.getAllRooms();
         for (String room:allRooms){
             if(roomId.equals(room)){
-              //  log.info("房间：{}",room);
+                log.info("房间：{}",room);
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己

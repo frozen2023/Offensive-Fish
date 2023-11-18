@@ -14,4 +14,5 @@ public interface RoomMapper {
     public void updateRoomStatusInc(int RoomId,String playerId);
     public void updateRoomStatusDec(int RoomId,String playerId);
     public void deleteRoom(int RoomId);
+    public int selectRoomByCode(String code);
 }
