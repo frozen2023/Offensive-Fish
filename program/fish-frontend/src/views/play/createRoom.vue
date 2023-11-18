@@ -66,7 +66,7 @@ export default {
       iptCode: '',
       isMaster: false,
       master: {
-        name: 'XH懒觉大支',
+        name: 'XH大支',
         status: true
       },
       player: {
