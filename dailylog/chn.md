@@ -20,3 +20,5 @@ https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF
 ## 11.15 陈浩楠 学习Qt，学习游戏策划
 
 ## 11.16 陈浩楠 和前端交谈细节实现、学习Qt 4h 0h
+
+## 11.17 陈浩楠 和前端交谈细节实现、学习Qt、学习游戏设计
