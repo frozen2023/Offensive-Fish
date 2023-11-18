@@ -31,6 +31,7 @@ public class RoomServiceImpl implements RoomService {
         room.setPlayerId("");
         room.setCode(code);
         roomMapper.insertRoom(room);
+        map.put("Object", room);
         map.put("msg", "房间创建成功");
         return map;
     }

@@ -39,7 +39,6 @@ class SocketIOServerRunner implements CommandLineRunner, DisposableBean {
         socketIOServer.getNamespace("/room").addListeners(roomHandler);
         socketIOServer.getNamespace("/test").addListeners(testHandler);
         socketIOServer.start();
-
         log.info("SocketIOServer==============================启动成功");
     }
 

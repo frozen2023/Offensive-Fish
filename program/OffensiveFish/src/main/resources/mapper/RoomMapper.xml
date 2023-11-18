@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fish.offensivefish.mapper.RoomMapper">
     <insert id="insertRoom" parameterType="com.fish.offensivefish.pojo.Room">
-        insert into offensivefish.room (roomownerid,playerid,code,numbers,isopen)
-        values (#{roomOwnerId},#{playerId},#{code},#{numbers},#{isOpen});
+        insert into offensivefish.room (roomId,roomownerid,playerid,code,numbers,isopen)
+        values (#{roomId},#{roomOwnerId},#{playerId},#{code},#{numbers},#{isOpen});
     </insert>
     <select id="selectRoomById" resultType="com.fish.offensivefish.pojo.Room">
         select *from offensivefish.room
