@@ -32,6 +32,21 @@ export default {
   data () {
     return {
       friList: [
+        { id: 1, nickName: '玩家1', isOnline: true },
+        { id: 2, nickName: '玩家2', isOnline: false },
+        { id: 3, nickName: '玩家3', isOnline: true },
+        { id: 4, nickName: '玩家4', isOnline: false },
+        { id: 5, nickName: '玩家5', isOnline: true },
+        { id: 6, nickName: '玩家6', isOnline: true },
+        { id: 7, nickName: '玩家7', isOnline: false },
+        { id: 8, nickName: '玩家8', isOnline: true },
+        { id: 9, nickName: '玩家9', isOnline: false },
+        { id: 10, nickName: '玩家10', isOnline: true },
+        { id: 11, nickName: '玩家11', isOnline: true },
+        { id: 12, nickName: '玩家12', isOnline: false },
+        { id: 13, nickName: '玩家13', isOnline: true },
+        { id: 14, nickName: '玩家14', isOnline: false },
+        { id: 15, nickName: '玩家15', isOnline: true }
       ],
     }
   },
@@ -59,11 +74,14 @@ export default {
     async getFriList() {
       await getFriendList().then((res) => {
         console.log(res)
-        this.$message.success('获取好友列表成功')
       })
       .catch((err) => {
         console.log(err)
-        this.$message.error('获取好友列表失败')
+        this.$message({
+          message: '获取好友列表失败',
+          type: 'error',
+          duration: 1000
+        })
       })
     }
   },

@@ -5,7 +5,7 @@ import axios from 'axios'
 
 // 创建 axios 实例，将来对创建出来的实例，进行自定义配置
 const instance = axios.create({
-  baseURL: 'http://10.132.62.87:9001/',
+  baseURL: 'http://192.168.238.103:9001/',
   timeout: 20000,
   crossDomain: true
 })

@@ -6,10 +6,5 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class baseController {
-          @RequestMapping("/game")
-        public String game(){
-              return "game";
-          }
-
-
+   
 }

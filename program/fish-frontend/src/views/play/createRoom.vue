@@ -9,11 +9,12 @@
         <div class="creation_invition">
           <div class="creation_invition_room">
             <div class="creation_invition_room_text">房间邀请码</div>
-            <div class="creation_invition_room_code">{{ code }}</div>
+            <div class="creation_invition_room_code">{{ roomInfo.code||'暂无邀请码' }}</div>
           </div>
           <div class="creation_invition_code">
             <div class="creation_invition_room_text">输入邀请码</div>
-            <input type="text" class="creation_invition_code_ipt" placeholder="请输入邀请码">
+            <input type="text" v-model="iptCode" class="creation_invition_code_ipt" placeholder="请输入邀请码">
+            <button class="enter" @click="enterRoom()">进入</button>
           </div>
         </div>
         <div class="creation_player">
@@ -30,7 +31,7 @@
         <div class="creation_btnbox">
           <button class="begin" @click="begin()" v-if="isMaster">开始</button>
           <button class="ready" @click="readying($event)" v-else>{{ player.status?'已准备':'准备' }}</button>
-          <button class="return" @click="$router.push('/home')">返回</button>
+          <button class="return" @click="exit()">返回</button>
         </div>
       </div>
       <Fri :style="customStyle"></Fri>
@@ -40,6 +41,12 @@
 
 <script>
 import Fri from '@/components/fri.vue'
+import { createRoom, destroyRoom } from '@/api/room.js'
+import { validRoom } from '@/utils/validate.js'
+import io from 'socket.io-client'
+import store from '@/store'
+import merge from 'webpack-merge';
+
 export default {
   name: 'createRoom',
   components: {
@@ -56,23 +63,47 @@ export default {
       noready: {
         backgroundColor: 'red'
       },
-      code: 'vivo50',
-      isMaster: true,
+      iptCode: '',
+      isMaster: false,
       master: {
-        name: 'xh懒觉大支',
+        name: 'XH大支',
         status: true
       },
       player: {
-        name: 'xh懒觉小支',
+        name: '',
         status: false
+      },
+      roomInfo: {
+        code: "3870",
+        isOpen: 1,
+        numbers: 1,
+        playerId: '',
+        roomId: 0,
+        roomOwnerId: "15860929147"
       }
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    enterType() {
+      return this.$route.query.type
+    }
+  },
+  watch: {
+    // 监听entertype变化
+    enterType(val) {
+      if (val === 'enter') {
+        this.isMaster = false
+      }
+    }
+  },
   methods: {
     begin() {
       this.$router.push('/area')
+    },
+    exit() {
+      if(this.destroyMyRoom()) {
+        this.$router.push('/home')
+      }
     },
     readying(e) {
       this.player.status = !this.player.status
@@ -81,9 +112,80 @@ export default {
       } else {
         e.target.style.backgroundColor = '#F4A962'
       }
+    },
+    // 销毁当前房间
+    async destroyMyRoom() {
+      await destroyRoom(this.roomInfo.roomId)
+      .then((res) => {
+        console.log(res)
+        console.log('房间销毁成功')
+        return true
+      })
+      .catch((err) => {
+        console.log(err)
+        return false
+      })
+    },
+    // 加入房间
+    async enterRoom () {
+      if(!validRoom(this.iptCode)) {
+        return
+      }
+      this.$router.push({
+          query: merge(this.$route.query,{'type': 'enter'})
+      })
+      // this.destroyMyRoom() // 销毁当前创建的房间
+      // this.roomInfo = {} // 清空房间信息
+      // await enterRoomByCode(this.iptCode)
+      // .then((res) => {
+      //   console.log(res)
+      // })
+      // .catch((err) => {
+      //   console.log(err)
+      // })
+    },
+    // 进入房间默认创建房间 
+    async createRoomByMaster() {
+      // await createRoom()
+      // .then((res) => {
+      //   const msg = res.data.msg
+      //   if(msg !== '房间创建成功') {
+      //     this.$message({
+      //       message: '创建房间失败',
+      //       type: 'error',
+      //       duration: 1000
+      //     })
+      //     return
+      //   }
+      //   this.roomInfo = res.data.Object
+      //   console.log(res)
+      //   socket = io('http://10.132.62.87:9999/', {
+      //     query: { userId: store.getters.loginId },
+      //   })
+      //   socket.on('connect', () => {
+      //     console.log('Socket 连接已建立')
+      //   })
+      //   // 监听 Socket 连接断开事件
+      //   socket.on('disconnect', () => {
+      //     console.log('Socket 连接已断开')
+      //   })
+      // })
+      // .catch((err) => {
+      //   console.log(err)
+      //   this.$message({
+      //     message: '创建房间失败',
+      //     type: 'error',
+      //     duration: 1000
+      //   })
+      // })
     }
   },
-  created () {},
+  created () {
+    if (this.enterType === 'create') {
+      this.isMaster = true
+      this.createRoomByMaster()
+    }
+  },
 }
 </script>
 <style scoped lang='less'>
@@ -142,7 +244,7 @@ export default {
       &_text {
         .pxfont(40);
         font-weight: 550;
-        margin-right: 2vw;
+        margin-right: 4%;
       }
       &_code, &_ipt {
         width: 50%;
@@ -153,6 +255,14 @@ export default {
         border: 0.2vw solid black;
         .pxfont(36);
       }
+    }
+    .enter {
+      height: 7vh;
+      width: 10%;
+      border-radius: 1vw;
+      background-color: #629DF4;
+      .pxfont(30);
+      margin-left: 4%;
     }
   }
   &_player {

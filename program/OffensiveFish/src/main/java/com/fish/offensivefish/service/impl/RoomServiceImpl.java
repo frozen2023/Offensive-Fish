@@ -31,7 +31,6 @@ public class RoomServiceImpl implements RoomService {
         room.setPlayerId("");
         room.setCode(code);
         roomMapper.insertRoom(room);
-        map.put("Object", room);
         map.put("msg", "房间创建成功");
         return map;
     }
@@ -97,4 +96,8 @@ public class RoomServiceImpl implements RoomService {
         }
         return map;
     }//退出房间，退出后房间人数减一，此时房间可以进入
+
+    public int getRoomId(String code) {
+        return roomMapper.selectRoomByCode(code);
+    }
 }
