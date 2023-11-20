@@ -64,24 +64,24 @@ const router = new VueRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   if (!authUrls.includes(to.path)) {
-//     // 非权限页面，放行
-//     next()
-//     return
-//   }
+router.beforeEach((to, from, next) => {
+  if (!authUrls.includes(to.path)) {
+    // 非权限页面，放行
+    next()
+    return
+  }
 
-//   // 权限页面，需要判断token
-//   const token = store.getters.token
-//   if (token) {
-//     next()
-//   } else {
-//     Vue.prototype.$message({
-//       message: '请先登录',
-//       type: 'info'
-//     })
-//     next('/login')
-//   }
-// })
+  // 权限页面，需要判断token
+  const token = store.getters.token
+  if (token) {
+    next()
+  } else {
+    Vue.prototype.$message({
+      message: '请先登录',
+      type: 'info'
+    })
+    next('/login')
+  }
+})
 
 export default router

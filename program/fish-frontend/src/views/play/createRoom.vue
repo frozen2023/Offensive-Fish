@@ -54,26 +54,27 @@ export default {
   },
   data () {
     return {
-      customStyle: {
+      customStyle: {  // 好友列表自定义样式
         height: '58vh'
       },
-      ready: {
+      ready: {  // 准备状态
         backgroundColor: 'green'
       },
-      noready: {
+      noready: { // 未准备状态
         backgroundColor: 'red'
       },
-      iptCode: '',
-      isMaster: false,
-      master: {
+      iptCode: '', // 输入的邀请码
+      isMaster: false, // 是否是房主
+      status: false, // 当前socket准备状态
+      master: { // 房主信息
         name: 'XH大支',
         status: true
       },
-      player: {
+      player: { // 玩家信息
         name: '',
         status: false
       },
-      roomInfo: {
+      roomInfo: { // 房间信息
         code: "3870",
         isOpen: 1,
         numbers: 1,
@@ -134,50 +135,60 @@ export default {
       this.$router.push({
           query: merge(this.$route.query,{'type': 'enter'})
       })
-      // this.destroyMyRoom() // 销毁当前创建的房间
-      // this.roomInfo = {} // 清空房间信息
-      // await enterRoomByCode(this.iptCode)
-      // .then((res) => {
-      //   console.log(res)
-      // })
-      // .catch((err) => {
-      //   console.log(err)
-      // })
+      this.destroyMyRoom() // 销毁当前创建的房间
+      this.roomInfo = {} // 清空房间信息
+      await enterRoomByCode(this.iptCode)
+      .then((res) => {
+        console.log(res)
+        // 加入房间成功后，创建socket连接
+        // socket = io()
+        
+        // 设置当前player的信息
+        this.player.name = store.getters.userName
+      })
+      .catch((err) => {
+        console.log(err)
+      })
     },
     // 进入房间默认创建房间 
     async createRoomByMaster() {
-      // await createRoom()
-      // .then((res) => {
-      //   const msg = res.data.msg
-      //   if(msg !== '房间创建成功') {
-      //     this.$message({
-      //       message: '创建房间失败',
-      //       type: 'error',
-      //       duration: 1000
-      //     })
-      //     return
-      //   }
-      //   this.roomInfo = res.data.Object
-      //   console.log(res)
-      //   socket = io('http://10.132.62.87:9999/', {
-      //     query: { userId: store.getters.loginId },
-      //   })
-      //   socket.on('connect', () => {
-      //     console.log('Socket 连接已建立')
-      //   })
-      //   // 监听 Socket 连接断开事件
-      //   socket.on('disconnect', () => {
-      //     console.log('Socket 连接已断开')
-      //   })
-      // })
-      // .catch((err) => {
-      //   console.log(err)
-      //   this.$message({
-      //     message: '创建房间失败',
-      //     type: 'error',
-      //     duration: 1000
-      //   })
-      // })
+      await createRoom()
+      .then((res) => {
+        const msg = res.data.msg
+        if(msg !== '房间创建成功') {
+          this.$message({
+            message: '创建房间失败',
+            type: 'error',
+            duration: 1000
+          })
+          return
+        }
+        this.roomInfo = res.data.Object
+        console.log(res)
+        socket = io('http://10.132.62.87:9999/', {
+          query: { userId: store.getters.loginId },
+        })
+        socket.on('connect', () => {
+          console.log('Socket 连接已建立')
+        })
+        //监听消息
+        socket.on('message', function (data) {
+          console.log('接收到服务器发送的消息：')
+          console.log(data)
+        });
+        // 监听 Socket 连接断开事件
+        socket.on('disconnect', () => {
+          console.log('Socket 连接已断开')
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+        this.$message({
+          message: '创建房间失败',
+          type: 'error',
+          duration: 1000
+        })
+      })
     }
   },
   created () {
