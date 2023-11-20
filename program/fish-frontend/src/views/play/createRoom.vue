@@ -81,7 +81,8 @@ export default {
         playerId: '',
         roomId: 0,
         roomOwnerId: "15860929147"
-      }
+      },
+      socket: null
     }
   },
   computed: {
@@ -96,6 +97,8 @@ export default {
         this.isMaster = false
       }
     }
+  },
+  mounted() {
   },
   methods: {
     begin() {
@@ -163,21 +166,30 @@ export default {
           })
           return
         }
-        this.roomInfo = res.data.Object
+        this.roomInfo = res.data.object
         console.log(res)
-        socket = io('http://10.132.62.87:9999/', {
-          query: { userId: store.getters.loginId },
-        })
-        socket.on('connect', () => {
+        this.socket = io.connect(`http://10.132.62.87:9999?userId=${ store.getters.loginId }`)
+        console.log(this.socket)
+        this.socket.on('connect', () => {
+          this.$message({
+            message: '房间创建成功, Socket连接成功',
+            type: 'success',
+            duration: 1500
+          })
           console.log('Socket 连接已建立')
         })
         //监听消息
-        socket.on('message', function (data) {
+        this.socket.on('error', (error) => {
+          console.log('连接错误：')
+          console.log(error)
+        });
+        //监听消息
+        this.socket.on('message', (data) => {
           console.log('接收到服务器发送的消息：')
           console.log(data)
         });
         // 监听 Socket 连接断开事件
-        socket.on('disconnect', () => {
+        this.socket.on('disconnect', () => {
           console.log('Socket 连接已断开')
         })
       })
