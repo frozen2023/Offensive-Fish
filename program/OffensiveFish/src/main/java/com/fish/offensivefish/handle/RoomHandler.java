@@ -36,14 +36,11 @@ public class RoomHandler {
             //返回给客户端，说我接收到了
             ackRequest.sendAckData("加入房间","!");
         }
-
     }
     //离开房间
     @OnEvent("leaveRoom")
     public void leaveRoom(SocketIOClient client, String data, AckRequest ackRequest) throws JsonProcessingException {
-
         client.leaveRoom(data);
-
         if(ackRequest.isAckRequested()){
             //返回给客户端，说我接收到了
             ackRequest.sendAckData("离开房间","成功");
@@ -60,7 +57,8 @@ public class RoomHandler {
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
-                socketIoServer.getRoomOperations(room).sendEvent("message", data);;
+                System.out.println("ewqq");
+                socketIoServer.getNamespace("/room").getRoomOperations(room).sendEvent("message", data);;
             }
 
         }
@@ -71,6 +69,23 @@ public class RoomHandler {
         }
 
     }
+    @OnEvent("move")
+    public void move(SocketIOClient client,String roomId, String data){
+        String userId = client.getHandshakeData().getSingleUrlParam("userId");
+        Set<String> allRooms = client.getAllRooms();
+        for (String room:allRooms){
+            if(roomId.equals(room)){
+                log.info("房间：{}",room);
+                //发送给指定空间名称以及房间的人，并且排除不发给自己
+                System.out.println("RommId"+roomId+data);
+                // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
+                //发送给指定空间名称以及房间的人，包括自己
+                socketIoServer.getRoomOperations(room).sendEvent("antherMove",userId,data);
 
+            }
+
+        }
+
+    }
 
 }

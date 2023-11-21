@@ -2,6 +2,7 @@ package com.fish.offensivefish.handle;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 
@@ -18,7 +19,8 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class SocketIOServerHandler {
-
+    @Autowired
+    private SocketIOServer socketIoServer;
     @Autowired
     private ClientCache clientCache;
 
@@ -28,21 +30,22 @@ public class SocketIOServerHandler {
      */
     @OnConnect
     public void onConnect(SocketIOClient client) {
-        System.out.println("zzzzzzzzzzzzzzzzzzzzzzzzz");
         //因为我定义用户的参数为userId，你也可以定义其他名称 客户端请求 http://localhost:9999?userId=12345
         //下面两种是加了命名空间的，他会请求对应命名空间的方法（就类似你进了不同的房间玩游戏）
         //因为我定义用户的参数为userId，你也可以定义其他名称 客户端请求 http://localhost:9999/test?userId=12345
         //因为我定义用户的参数为userId，你也可以定义其他名称 客户端请求 http://localhost:9999/SocketIO?userId=12345
         String userId = client.getHandshakeData().getSingleUrlParam("userId");
-
         //同一个页面sessionid一样的
         UUID sessionId = client.getSessionId();
 
         //保存用户的信息在缓存里面
         clientCache.saveClient(userId,sessionId,client);
-
-        log.info("SocketIOServerHandler-用户id:{},sessionId:{},建立连接成功",userId,sessionId);
-
+        client.sendEvent("message", "onConnect back");
+        log.info("客户端:" + client.getRemoteAddress() + "  sessionId:" + client.getSessionId() +" userId: "+ userId+ "已连接");
+//        if(ackRequest.isAckRequested()){
+//            //返回给客户端，说我接收到了
+//            ackRequest.sendAckData(" 连接","成功");
+//        }
 
     }
 

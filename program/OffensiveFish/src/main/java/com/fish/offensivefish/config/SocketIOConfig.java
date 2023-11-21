@@ -60,12 +60,10 @@ public class SocketIOConfig {
         System.out.println("qwewqqweqewq"+ Arrays.toString(namespaces));
         //服务端
         final SocketIOServer server = new SocketIOServer(config);
-
         //添加命名空间（如果你不需要命名空间，下面的代码可以去掉）
         Optional.ofNullable(namespaces).ifPresent(nss ->
                 Arrays.stream(nss).forEach(server::addNamespace));
-//        server.addNamespace("/Game");
-//        server.addNamespace("/Room");
+
 
         return server;
     }
