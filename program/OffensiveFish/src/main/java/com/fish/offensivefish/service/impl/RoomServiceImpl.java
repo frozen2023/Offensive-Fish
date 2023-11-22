@@ -32,6 +32,7 @@ public class RoomServiceImpl implements RoomService {
         room.setCode(code);
         roomMapper.insertRoom(room);
         map.put("msg", "房间创建成功");
+        map.put("object",room);
         return map;
     }
     public Map<String,Object> selectRoomById(int RoomId){
