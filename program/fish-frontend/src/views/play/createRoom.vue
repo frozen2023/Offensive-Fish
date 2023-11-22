@@ -45,7 +45,7 @@ import { createRoom, destroyRoom } from '@/api/room.js'
 import { validRoom } from '@/utils/validate.js'
 import io from 'socket.io-client'
 import store from '@/store'
-import merge from 'webpack-merge';
+import merge from 'webpack-merge'
 
 export default {
   name: 'createRoom',
@@ -75,12 +75,6 @@ export default {
         status: false
       },
       roomInfo: { // 房间信息
-        code: "3870",
-        isOpen: 1,
-        numbers: 1,
-        playerId: '',
-        roomId: 0,
-        roomOwnerId: "15860929147"
       },
       socket: null
     }
@@ -88,6 +82,9 @@ export default {
   computed: {
     enterType() {
       return this.$route.query.type
+    },
+    masterId() {
+      return store.getters.loginId
     }
   },
   watch: {
@@ -99,6 +96,7 @@ export default {
     }
   },
   mounted() {
+
   },
   methods: {
     begin() {
@@ -167,15 +165,14 @@ export default {
           return
         }
         this.roomInfo = res.data.object
-        console.log(res)
-        this.socket = io.connect(`http://10.132.62.87:9999?userId=${ store.getters.loginId }`)
+        this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.masterId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
         console.log(this.socket)
         this.socket.on('connect', () => {
-          this.$message({
-            message: '房间创建成功, Socket连接成功',
-            type: 'success',
-            duration: 1500
-          })
+          // this.$message({
+          //   message: '房间创建成功, Socket连接成功',
+          //   type: 'success',
+          //   duration: 1500
+          // })
           console.log('Socket 连接已建立')
         })
         //监听消息

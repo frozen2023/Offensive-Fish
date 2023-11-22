@@ -58,6 +58,14 @@ export default {
   computed: {},
   methods: {
     goPlay() {
+      if(!this.$store.getters.token) {
+        this.$message({
+          message: '请先登录',
+          type: 'warning'
+        })
+        this.$router.push('/auth')
+        return
+      }
       this.$router.push({
         path: '/room',
         query: {
