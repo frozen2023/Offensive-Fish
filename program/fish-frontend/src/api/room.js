@@ -20,11 +20,30 @@ export const destroyRoom = (roomId) => {
 }
 
 // 3.进入房间
-export const enterRoomByCode = (code) => {
+export const enterRoomByCode = (code, roomId) => {
   return request.get('/Room/entryRoom', {
     params: {
       code,
-      playerId: store.getters.loginId
+      playerId: store.getters.userName,
+      roomId
+    }
+  })
+}
+
+// 4.获得房间ID
+export const getRoomId = (code) => {
+  return request.get('/Room/getRoomId', {
+    params: {
+      code
+    }
+  })
+}
+
+// 5.获得房间信息
+export const getRoomInfo = (roomId) => {
+  return request.get('/Room/selectRoomById', {
+    params: {
+      roomId
     }
   })
 }
