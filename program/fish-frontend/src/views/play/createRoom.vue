@@ -41,7 +41,7 @@
 
 <script>
 import Fri from '@/components/fri.vue'
-import { createRoom, destroyRoom } from '@/api/room.js'
+import { createRoom, destroyRoom, getRoomId, getRoomInfo, enterRoomByCode } from '@/api/room.js'
 import { validRoom } from '@/utils/validate.js'
 import io from 'socket.io-client'
 import store from '@/store'
@@ -66,8 +66,9 @@ export default {
       iptCode: '', // 输入的邀请码
       isMaster: false, // 是否是房主
       status: false, // 当前socket准备状态
+      roomId: '', // 当前房间ID
       master: { // 房主信息
-        name: 'XH大支',
+        name: '',
         status: true
       },
       player: { // 玩家信息
@@ -93,10 +94,36 @@ export default {
       if (val === 'enter') {
         this.isMaster = false
       }
+    },
+    // 监听roomInfo变化
+    roomInfo(val) {
+      if (val) {
+        this.getRoomID(this.roomInfo.code)
+      }
     }
   },
   mounted() {
-
+    if(this.socket) {
+      //监听消息
+      this.socket.on('message', (data) => {
+        console.log('接收到服务器发送的消息：')
+        console.log(data)
+      });
+      //监听消息
+      this.socket.on('error', (error) => {
+        this.$message({
+          message: 'Socket连接错误',
+          type: 'error',
+          duration: 1500
+        })
+        console.log('连接错误：')
+        console.log(error)
+      });
+      // 监听 Socket 连接断开事件
+      this.socket.on('disconnect', () => {
+        console.log('Socket 连接已断开')
+      })
+    }
   },
   methods: {
     begin() {
@@ -117,10 +144,13 @@ export default {
     },
     // 销毁当前房间
     async destroyMyRoom() {
-      await destroyRoom(this.roomInfo.roomId)
+      await destroyRoom(this.roomId)
       .then((res) => {
-        console.log(res)
-        console.log('房间销毁成功')
+        this.socket.emit("leaveRoom", this.roomId,  (data) => {
+          console.log("ack:"+data)
+        })
+        this.roomInfo = {} // 清空房间信息
+        this.socket.disconnect()
         return true
       })
       .catch((err) => {
@@ -129,23 +159,35 @@ export default {
       })
     },
     // 加入房间
-    async enterRoom () {
+    async enterRoom() {
       if(!validRoom(this.iptCode)) {
         return
       }
-      this.$router.push({
-          query: merge(this.$route.query,{'type': 'enter'})
-      })
       this.destroyMyRoom() // 销毁当前创建的房间
-      this.roomInfo = {} // 清空房间信息
-      await enterRoomByCode(this.iptCode)
+      this.$router.push({
+        query: merge(this.$route.query,{'type': 'enter'})
+      })
+      this.getRoomID(this.iptCode)
+      console.log('获得roomid', this.roomId)
+      await enterRoomByCode(this.iptCode, this.roomId)
       .then((res) => {
-        console.log(res)
+        console.log('请求获得房间信息',res)
+        this.getRoomInfomation()
         // 加入房间成功后，创建socket连接
-        // socket = io()
+        // this.socket = io.connect(`ws://10.132.62.87:9999?userId=${  }`,{transports:['websocket','xhr-polling','jsonp-polling']})
         
         // 设置当前player的信息
         this.player.name = store.getters.userName
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    },
+    //获取房间信息
+    async getRoomInfomation() {
+      await getRoomInfo(this.roomId)
+      .then((res) => {
+        this.master.name = res.data.msg.roomOwnerId
       })
       .catch((err) => {
         console.log(err)
@@ -166,34 +208,33 @@ export default {
         }
         this.roomInfo = res.data.object
         this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.masterId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
-        console.log(this.socket)
         this.socket.on('connect', () => {
-          // this.$message({
-          //   message: '房间创建成功, Socket连接成功',
-          //   type: 'success',
-          //   duration: 1500
-          // })
+          this.$message({
+            message: '房间创建成功, Socket连接成功',
+            type: 'success',
+            duration: 1500
+          })
           console.log('Socket 连接已建立')
-        })
-        //监听消息
-        this.socket.on('error', (error) => {
-          console.log('连接错误：')
-          console.log(error)
-        });
-        //监听消息
-        this.socket.on('message', (data) => {
-          console.log('接收到服务器发送的消息：')
-          console.log(data)
-        });
-        // 监听 Socket 连接断开事件
-        this.socket.on('disconnect', () => {
-          console.log('Socket 连接已断开')
+          this.master.name = store.getters.userName
         })
       })
       .catch((err) => {
         console.log(err)
         this.$message({
           message: '创建房间失败',
+          type: 'error',
+          duration: 1000
+        })
+      })
+    },
+    async getRoomID(code) {
+      await getRoomId(code)
+      .then((res) => {
+        this.roomId = res.data
+      })
+      .catch((err) => {
+        this.$message({
+          message: '获取房间ID失败',
           type: 'error',
           duration: 1000
         })
