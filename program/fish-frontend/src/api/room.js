@@ -20,12 +20,11 @@ export const destroyRoom = (roomId) => {
 }
 
 // 3.进入房间
-export const enterRoomByCode = (code, roomId) => {
+export const enterRoomByCode = (code) => {
   return request.get('/Room/entryRoom', {
     params: {
       code,
-      playerId: store.getters.userName,
-      roomId
+      playerId: store.getters.loginId,
     }
   })
 }
