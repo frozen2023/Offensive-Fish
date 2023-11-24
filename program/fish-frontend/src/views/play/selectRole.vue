@@ -51,14 +51,15 @@
 </template>
 
 <script>
+import store from '@/store'
 export default {
   name: 'slectRole',
   components: {},
   data () {
     return {
       players: [
-        { id: 1, name: 'XH懒觉大支', master: false, pos: 'P1', selection: '' },
-        { id: 2, name: 'XH懒觉小支', master: true, pos: 'P2', selection: '' },
+        { id: 1, name: '', master: true, pos: 'P1', selection: '' },
+        { id: 2, name: '', master: false, pos: 'P2', selection: '' },
       ],
       roles: [
         { img: require('@/assets/images/1.png'), slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
@@ -116,6 +117,13 @@ export default {
     },
   },
   created () {
+    if(localStorage.getItem('isMaster') === 'true') {
+      this.players[0].name = store.getters.userName
+      // this.players[1].name = localStorage.getItem('otherName')
+    } else {
+      // this.players[0].name = localStorage.getItem('otherName')
+      this.players[1].name = store.getters.userName
+    }
     if (!this.timer && this.second === this.totalSecond) {
       this.timer = setInterval(() => {
         this.second--

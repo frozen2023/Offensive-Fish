@@ -14,14 +14,14 @@
           <div class="creation_invition_code">
             <div class="creation_invition_room_text">输入邀请码</div>
             <input type="text" v-model="iptCode" class="creation_invition_code_ipt" placeholder="请输入邀请码">
-            <button class="enter" @click="enterRoom()">进入</button>
+            <button class="enter" @click="enter()">进入</button>
           </div>
         </div>
         <div class="creation_player">
           <div class="creation_player_text">当前玩家</div>
           <div class="creation_player_master">
             <div class="creation_player_status" :style="master.status?ready:noready"></div>
-            <div class="creation_player_name">{{ master.name }}(我)</div>
+            <div class="creation_player_name">{{ master.name }}</div>
           </div>
           <div class="creation_player_other">
             <div class="creation_player_status" :style="player.status?ready:noready"></div>
@@ -43,6 +43,7 @@
 import Fri from '@/components/fri.vue'
 import { createRoom, destroyRoom, getRoomId, getRoomInfo, enterRoomByCode } from '@/api/room.js'
 import { validRoom } from '@/utils/validate.js'
+import { setRoomInfoByLocal, getRoomInfoByLocal } from '@/utils/storage'
 import io from 'socket.io-client'
 import store from '@/store'
 import merge from 'webpack-merge'
@@ -66,14 +67,16 @@ export default {
       iptCode: '', // 输入的邀请码
       isMaster: false, // 是否是房主
       status: false, // 当前socket准备状态
-      roomId: '', // 当前房间ID
+      roomId: -1 || roomInfo.roomId, // 当前房间ID
       master: { // 房主信息
         name: '',
-        status: true
+        status: true,
+        isMaster: true
       },
       player: { // 玩家信息
         name: '',
-        status: false
+        status: false,
+        isMaster: false
       },
       roomInfo: { // 房间信息
       },
@@ -93,12 +96,6 @@ export default {
     enterType(val) {
       if (val === 'enter') {
         this.isMaster = false
-      }
-    },
-    // 监听roomInfo变化
-    roomInfo(val) {
-      if (val) {
-        this.getRoomID(this.roomInfo.code)
       }
     }
   },
@@ -146,10 +143,10 @@ export default {
     async destroyMyRoom() {
       await destroyRoom(this.roomId)
       .then((res) => {
-        this.socket.emit("leaveRoom", this.roomId,  (data) => {
-          console.log("ack:"+data)
-        })
+        this.socket.emit("leaveRoom", this.roomId)
         this.roomInfo = {} // 清空房间信息
+        setRoomInfoByLocal({}) // 清空本地房间信息
+        localStorage.setItem('isMaster', false)
         this.socket.disconnect()
         return true
       })
@@ -159,25 +156,44 @@ export default {
       })
     },
     // 加入房间
-    async enterRoom() {
+    enter() {
       if(!validRoom(this.iptCode)) {
         return
       }
       this.destroyMyRoom() // 销毁当前创建的房间
+      this.enterRoom()
+    },
+    async enterRoom() {
       this.$router.push({
         query: merge(this.$route.query,{'type': 'enter'})
       })
-      this.getRoomID(this.iptCode)
-      console.log('获得roomid', this.roomId)
-      await enterRoomByCode(this.iptCode, this.roomId)
+      await enterRoomByCode(this.iptCode)
       .then((res) => {
-        console.log('请求获得房间信息',res)
+        console.log('请求获得房间信息', res)
+        localStorage.setItem('isMaster', false)
         this.getRoomInfomation()
+        if(res.data.msg === '成功进入房间') {
+          this.$message({
+            message: res.data.msg,
+            type: 'success',
+            duration: 1500
+          })
+          this.roomInfo = res.data.object
+          setRoomInfoByLocal(res.data.object)
+        }
         // 加入房间成功后，创建socket连接
-        // this.socket = io.connect(`ws://10.132.62.87:9999?userId=${  }`,{transports:['websocket','xhr-polling','jsonp-polling']})
-        
-        // 设置当前player的信息
-        this.player.name = store.getters.userName
+        this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.roomInfo.roomOwnerId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
+        this.socket.emit("joinRoom", this.roomId)
+        this.socket.on('connect', () => {
+          this.$message({
+            message: '房间创建成功, Socket连接成功',
+            type: 'success',
+            duration: 1500
+          })
+          this.master.name = this.roomInfo.roomOwnerId  // 设置当前master的信息
+          this.player.name = store.getters.userName + '(我)'  // 设置当前player的信息
+          localStorage.setItem('isMaster', false)
+        })
       })
       .catch((err) => {
         console.log(err)
@@ -207,6 +223,8 @@ export default {
           return
         }
         this.roomInfo = res.data.object
+        this.getRoomID(this.roomInfo.code)
+        setRoomInfoByLocal(res.data.object)
         this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.masterId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
         this.socket.on('connect', () => {
           this.$message({
@@ -214,8 +232,8 @@ export default {
             type: 'success',
             duration: 1500
           })
-          console.log('Socket 连接已建立')
-          this.master.name = store.getters.userName
+          this.master.name = store.getters.userName + '(我)'
+          localStorage.setItem('isMaster', true)
         })
       })
       .catch((err) => {
@@ -231,6 +249,7 @@ export default {
       await getRoomId(code)
       .then((res) => {
         this.roomId = res.data
+        this.roomInfo.roomId = res.data
       })
       .catch((err) => {
         this.$message({
