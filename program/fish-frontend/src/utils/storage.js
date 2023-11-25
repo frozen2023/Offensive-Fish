@@ -34,7 +34,7 @@ export const setRoomInfoByLocal = (obj) => {
 
 // 获取房间信息
 export const getRoomInfoByLocal = () => {
-  const defaultObj = { roomId: '', roomOwnerId: '', code: '', numbers: 1, isOpen: 1, playerId: '' }
+  const defaultObj = { roomId: '', roomOwnerId: '', code: '', numbers: 1, isOpen: 1, playerId: '', roomOwnerName: '' }
   const result = localStorage.getItem(ROOM_KEY)
   return result ? JSON.parse(result) : defaultObj
 }
