@@ -99,29 +99,6 @@ export default {
       }
     }
   },
-  mounted() {
-    if(this.socket) {
-      //监听消息
-      this.socket.on('message', (data) => {
-        console.log('接收到服务器发送的消息：')
-        console.log(data)
-      });
-      //监听消息
-      this.socket.on('error', (error) => {
-        this.$message({
-          message: 'Socket连接错误',
-          type: 'error',
-          duration: 1500
-        })
-        console.log('连接错误：')
-        console.log(error)
-      });
-      // 监听 Socket 连接断开事件
-      this.socket.on('disconnect', () => {
-        console.log('Socket 连接已断开')
-      })
-    }
-  },
   methods: {
     begin() {
       this.$router.push('/area')
@@ -143,11 +120,10 @@ export default {
     async destroyMyRoom() {
       await destroyRoom(this.roomId)
       .then((res) => {
-        this.socket.emit("leaveRoom", this.roomId)
+        this.socket.emit("leaveRoom", this.roomInfo.roomId)
         this.roomInfo = {} // 清空房间信息
         setRoomInfoByLocal({}) // 清空本地房间信息
         localStorage.setItem('isMaster', false)
-        this.socket.disconnect()
         return true
       })
       .catch((err) => {
@@ -171,7 +147,6 @@ export default {
       .then((res) => {
         console.log('请求获得房间信息', res)
         localStorage.setItem('isMaster', false)
-        this.getRoomInfomation()
         if(res.data.msg === '成功进入房间') {
           this.$message({
             message: res.data.msg,
@@ -179,18 +154,19 @@ export default {
             duration: 1500
           })
           this.roomInfo = res.data.object
+          this.roomId = res.data.object.roomId
           setRoomInfoByLocal(res.data.object)
         }
+        this.getRoomInfomation() // 获取加入的房间信息
         // 加入房间成功后，创建socket连接
+        this.socket.emit("joinRoom", this.roomInfo.roomId) // 监听加入房间函数
         this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.roomInfo.roomOwnerId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
-        this.socket.emit("joinRoom", this.roomId)
         this.socket.on('connect', () => {
           this.$message({
             message: '房间创建成功, Socket连接成功',
             type: 'success',
             duration: 1500
           })
-          this.master.name = this.roomInfo.roomOwnerId  // 设置当前master的信息
           this.player.name = store.getters.userName + '(我)'  // 设置当前player的信息
           localStorage.setItem('isMaster', false)
         })
@@ -201,9 +177,9 @@ export default {
     },
     //获取房间信息
     async getRoomInfomation() {
-      await getRoomInfo(this.roomId)
+      await getRoomInfo(this.roomInfo.roomId)
       .then((res) => {
-        this.master.name = res.data.msg.roomOwnerId
+        this.master.name = res.data.msg.roomOwnerName
       })
       .catch((err) => {
         console.log(err)
@@ -235,6 +211,31 @@ export default {
           this.master.name = store.getters.userName + '(我)'
           localStorage.setItem('isMaster', true)
         })
+        this.socket.emit("joinRoom", this.roomInfo.roomId)
+        //监听消息
+        this.socket.on('message', (data) => {
+          console.log(data)
+          if(data.name !== this.master.name) {
+            this.player.name = data.name
+            this.roomInfo.playerId = data.userName
+            this.roomInfo.numbers = 2
+            setRoomInfoByLocal(this.roomInfo)
+          }
+        })
+        //监听消息
+        this.socket.on('error', (error) => {
+          this.$message({
+            message: 'Socket连接错误',
+            type: 'error',
+            duration: 1500
+          })
+          console.log('连接错误：')
+          console.log(error)
+        });
+        // 监听 Socket 连接断开事件
+        this.socket.on('disconnect', () => {
+          console.log('Socket 连接已断开')
+        })
       })
       .catch((err) => {
         console.log(err)
@@ -245,6 +246,7 @@ export default {
         })
       })
     },
+    // 获取房间ID
     async getRoomID(code) {
       await getRoomId(code)
       .then((res) => {
