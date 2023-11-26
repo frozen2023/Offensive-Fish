@@ -145,14 +145,8 @@ export default {
       })
       await enterRoomByCode(this.iptCode)
       .then((res) => {
-        console.log('请求获得房间信息', res)
         localStorage.setItem('isMaster', false)
         if(res.data.msg === '成功进入房间') {
-          this.$message({
-            message: res.data.msg,
-            type: 'success',
-            duration: 1500
-          })
           this.roomInfo = res.data.object
           this.roomId = res.data.object.roomId
           setRoomInfoByLocal(res.data.object)
@@ -162,11 +156,6 @@ export default {
         this.socket.emit("joinRoom", this.roomInfo.roomId) // 监听加入房间函数
         this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.roomInfo.roomOwnerId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
         this.socket.on('connect', () => {
-          this.$message({
-            message: '房间创建成功, Socket连接成功',
-            type: 'success',
-            duration: 1500
-          })
           this.player.name = store.getters.userName + '(我)'  // 设置当前player的信息
           localStorage.setItem('isMaster', false)
         })
@@ -206,7 +195,7 @@ export default {
           this.$message({
             message: '房间创建成功, Socket连接成功',
             type: 'success',
-            duration: 1500
+            duration: 2000
           })
           this.master.name = store.getters.userName + '(我)'
           localStorage.setItem('isMaster', true)
@@ -215,19 +204,35 @@ export default {
         //监听消息
         this.socket.on('message', (data) => {
           console.log(data)
-          if(data.name !== this.master.name) {
+          if(data.isMaster !== 1 && data.msg == '进入房间！') {
             this.player.name = data.name
+            this.$message({
+              message: this.player.name + data.msg,
+              type: 'info',
+              duration: 2000
+            })
             this.roomInfo.playerId = data.userName
             this.roomInfo.numbers = 2
             setRoomInfoByLocal(this.roomInfo)
           }
+          if(data.isMaster == 1 && data.msg == '离开房间！') {
+            if(localStorage.getItem('isMaster') == 'false') {
+              this.$message({
+                message: '房主离开房间，房间已解散',
+                type: 'info',
+                duration: 2000
+              })
+              this.socket.emit("leaveRoom", this.roomInfo.roomId)
+              setRoomInfoByLocal({})
+              this.$router.push('/home')
+            }
+          }
         })
-        //监听消息
         this.socket.on('error', (error) => {
           this.$message({
             message: 'Socket连接错误',
             type: 'error',
-            duration: 1500
+            duration: 1800
           })
           console.log('连接错误：')
           console.log(error)
@@ -242,7 +247,7 @@ export default {
         this.$message({
           message: '创建房间失败',
           type: 'error',
-          duration: 1000
+          duration: 2000
         })
       })
     },
