@@ -4,6 +4,11 @@ import store from '@/store'
 // 1. 创建房间 
 export const createRoom = () => {
   return request.get('/Room/createNewRoom', {
+    // 设置允许跨域
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      withCredentials: true,
+    },
     params: {
       userName: store.getters.loginId
     }
@@ -14,7 +19,8 @@ export const createRoom = () => {
 export const destroyRoom = (roomId) => {
   return request.get('/Room/ExitRoom', {
     params: {
-      roomId
+      roomId,
+      userId: store.getters.loginId
     }
   })
 }

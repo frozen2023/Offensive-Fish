@@ -79,8 +79,7 @@ export default {
         isMaster: false
       },
       roomInfo: { // 房间信息
-      },
-      socket: null
+      }
     }
   },
   computed: {
@@ -89,6 +88,9 @@ export default {
     },
     masterId() {
       return store.getters.loginId
+    },
+    socket() {
+      return store.getters.socket
     }
   },
   watch: {
@@ -101,27 +103,35 @@ export default {
   },
   methods: {
     begin() {
-      if(!this.player.status) {
+      if(this.player.name == '') {
         this.$message({
-          message: this.play.name + '未准备',
+          message: '请等待玩家加入',
           type: 'info',
           duration: 2000
         })
         return
       }
+      if(!this.player.status) {
+        this.$message({
+          message: this.player.name + '未准备',
+          type: 'info',
+          duration: 2000
+        })
+        return
+      }
+      this.socket.emit('playGame', this.roomInfo.roomId)
+      localStorage.setItem('playerName', this.player.name)
+      store.commit('socket/setRoomId', this.roomInfo.roomId)
       this.$router.push('/area')
     },
     exit() {
-      if(localStorage.getItem('isMaster') == 'false') {
-        // 非房主玩家无需销毁房间
-        this.socket.emit("leaveRoom", this.roomInfo.roomId)
-        setRoomInfoByLocal({})
-        this.$router.push('/home')
-        return
-      }
-      if(this.destroyMyRoom()) {
+      if(!this.socket) {
         this.$router.push('/home')
       }
+      this.socket.emit("leaveRoom", this.roomInfo.roomId)
+      setRoomInfoByLocal({})
+      this.destroyMyRoom()
+      this.$router.push('/home')
     },
     readying(e) {
       this.player.status = !this.player.status
@@ -130,32 +140,27 @@ export default {
       } else {
         e.target.style.backgroundColor = '#F4A962'
       }
+      if(this.player.status) {
+        this.socket.emit('prepare', this.roomInfo.roomId)
+      } else {
+        this.socket.emit('unprepared', this.roomInfo.roomId)
+      }
     },
     // 销毁当前房间
-    async destroyMyRoom() {
-      await destroyRoom(this.roomId)
-      .then((res) => {
-        this.socket.emit("leaveRoom", this.roomInfo.roomId)
-        this.roomInfo = {} // 清空房间信息
-        setRoomInfoByLocal({}) // 清空本地房间信息
-        localStorage.setItem('isMaster', false)
-        return true
-      })
-      .catch((err) => {
-        console.log(err)
-        return false
-      })
+    destroyMyRoom() {
+      destroyRoom(this.roomId)
     },
     // 加入房间
     enter() {
       if(!validRoom(this.iptCode)) {
         return
       }
+      this.socket.emit("leaveRoom", this.roomInfo.roomId)
       this.destroyMyRoom() // 销毁当前创建的房间
       this.enterRoom()
     },
     async enterRoom() {
-      if(this.$rouet.query.type !== 'enter') {
+      if(this.enterType !== 'enter') {
         this.$router.push({
           query: merge(this.$route.query,{'type': 'enter'})
         })
@@ -170,16 +175,16 @@ export default {
       }
       await enterRoomByCode(this.iptCode)
       .then((res) => {
-        localStorage.setItem('isMaster', false)
         if(res.data.msg === '成功进入房间') {
           this.roomInfo = res.data.object
           this.roomId = res.data.object.roomId
           setRoomInfoByLocal(res.data.object)
+          this.getRoomInfomation() // 获取加入的房间信息
         }
-        this.getRoomInfomation() // 获取加入的房间信息
         // 加入房间成功后，创建socket连接
         this.socket.emit("joinRoom", this.roomInfo.roomId) // 监听加入房间函数
-        this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.roomInfo.roomOwnerId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
+        const socket = io.connect(`ws://10.132.62.87:9999?userId=${ store.getters.loginId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
+        store.commit('socket/setSocket', socket)
         this.socket.on('connect', () => {
           this.player.name = store.getters.userName + '(我)'  // 设置当前player的信息
           localStorage.setItem('isMaster', false)
@@ -194,6 +199,7 @@ export default {
       await getRoomInfo(this.roomInfo.roomId)
       .then((res) => {
         this.master.name = res.data.msg.roomOwnerName
+        this.roomInfo = res.data.msg
       })
       .catch((err) => {
         console.log(err)
@@ -215,15 +221,17 @@ export default {
         this.roomInfo = res.data.object
         this.getRoomID(this.roomInfo.code)
         setRoomInfoByLocal(res.data.object)
-        this.socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.masterId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
+        localStorage.setItem('isMaster', true)
+        const socket = io.connect(`ws://10.132.62.87:9999?userId=${ this.masterId }`,{transports:['websocket','xhr-polling','jsonp-polling']})
+        store.commit('socket/setSocket', socket)
         this.socket.on('connect', () => {
           this.$message({
             message: '房间创建成功, Socket连接成功',
             type: 'success',
             duration: 2000
           })
+          // console.log(this.socket.getSession());
           this.master.name = store.getters.userName + '(我)'
-          localStorage.setItem('isMaster', true)
         })
         this.socket.emit("joinRoom", this.roomInfo.roomId)
         //监听消息
@@ -240,24 +248,19 @@ export default {
             this.roomInfo.numbers = 2
             setRoomInfoByLocal(this.roomInfo)
           }
-          if(data.isMaster == 1 && data.msg == '离开房间！') {
-            this.master = {
-              name: '',
-              status: false,
-              isMaster: true
-            }
+          if(data.isMaster === 1 && data.msg == '离开房间！') {
             if(localStorage.getItem('isMaster') == 'false') {
               this.$message({
                 message: '房主离开房间，房间已解散',
                 type: 'info',
                 duration: 2000
               })
-              this.socket.emit("leaveRoom", this.roomInfo.roomId)
               setRoomInfoByLocal({})
               this.$router.push('/home')
               return
             }
-          } else if(data.isMaster !== 1 && data.msg == '离开房间！') {
+          } 
+          else if(data.isMaster !== 1 && data.msg == '离开房间！') {
             this.$message({
               message: this.player.name + data.msg,
               type: 'info',
@@ -271,6 +274,38 @@ export default {
               isMaster: false
             }
             setRoomInfoByLocal(this.roomInfo)
+          }
+          if(data.msg == '已经准备!') {
+            if(localStorage.getItem('isMaster') == 'true') {
+              this.$message({
+                message: data.name + '已准备',
+                type: 'info',
+                duration: 2000
+              })
+            }
+            this.player.status = true // 设置非房主玩家准备状态
+          }
+          else if(data.msg == '取消准备!') {
+            if(localStorage.getItem('isMaster') == 'true') {
+              this.$message({
+                message: data.name + '取消准备',
+                type: 'info',
+                duration: 2000
+              })
+            }
+            this.player.status = false // 设置非房主玩家准备状态
+          }
+          if(data.msg == '开始游戏!' && localStorage.getItem('isMaster') == 'false') {
+            this.$message({
+              message: '游戏开始！',
+              type: 'info',
+              duration: 2000
+            })
+            store.commit('socket/setRoomId', this.roomInfo.roomId)
+            this.$router.push('/area')
+          }
+          if(data.msg == '选择地图成功!' && localStorage.getItem('isMaster') == 'false') {
+            localStorage.setItem('mapId', data.map)
           }
         })
         this.socket.on('error', (error) => {
@@ -307,7 +342,7 @@ export default {
         this.$message({
           message: '获取房间ID失败',
           type: 'error',
-          duration: 1000
+          duration: 1700
         })
       })
     }
