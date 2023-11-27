@@ -101,9 +101,24 @@ export default {
   },
   methods: {
     begin() {
+      if(!this.player.status) {
+        this.$message({
+          message: this.play.name + '未准备',
+          type: 'info',
+          duration: 2000
+        })
+        return
+      }
       this.$router.push('/area')
     },
     exit() {
+      if(localStorage.getItem('isMaster') == 'false') {
+        // 非房主玩家无需销毁房间
+        this.socket.emit("leaveRoom", this.roomInfo.roomId)
+        setRoomInfoByLocal({})
+        this.$router.push('/home')
+        return
+      }
       if(this.destroyMyRoom()) {
         this.$router.push('/home')
       }
@@ -140,9 +155,19 @@ export default {
       this.enterRoom()
     },
     async enterRoom() {
-      this.$router.push({
-        query: merge(this.$route.query,{'type': 'enter'})
-      })
+      if(this.$rouet.query.type !== 'enter') {
+        this.$router.push({
+          query: merge(this.$route.query,{'type': 'enter'})
+        })
+      }
+      if(this.iptCode == this.roomInfo.code) {
+        this.$message({
+          message: '你已经在该房间',
+          type: 'info',
+          duration: 2000
+        })
+        return
+      }
       await enterRoomByCode(this.iptCode)
       .then((res) => {
         localStorage.setItem('isMaster', false)
@@ -216,6 +241,11 @@ export default {
             setRoomInfoByLocal(this.roomInfo)
           }
           if(data.isMaster == 1 && data.msg == '离开房间！') {
+            this.master = {
+              name: '',
+              status: false,
+              isMaster: true
+            }
             if(localStorage.getItem('isMaster') == 'false') {
               this.$message({
                 message: '房主离开房间，房间已解散',
@@ -225,7 +255,22 @@ export default {
               this.socket.emit("leaveRoom", this.roomInfo.roomId)
               setRoomInfoByLocal({})
               this.$router.push('/home')
+              return
             }
+          } else if(data.isMaster !== 1 && data.msg == '离开房间！') {
+            this.$message({
+              message: this.player.name + data.msg,
+              type: 'info',
+              duration: 2000
+            })
+            this.roomInfo.numbers = 1
+            this.roomInfo.playerId = ''
+            this.player = {
+              name: '',
+              status: false,
+              isMaster: false
+            }
+            setRoomInfoByLocal(this.roomInfo)
           }
         })
         this.socket.on('error', (error) => {
