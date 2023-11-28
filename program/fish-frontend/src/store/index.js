@@ -21,7 +21,19 @@ export default new Vuex.Store({
     },
     roomId (state) {
       return state.socket.roomId
-    }
+    },
+    mapId (state) {
+      return state.socket.mapId
+    },
+    masterRoleId (state) {
+      return state.socket.masterRoleId
+    },
+    playerRoleId (state) {
+      return state.socket.playerRoleId
+    },
+    chatMessages (state) {
+      return state.socket.chatMessages
+    },
   },
   modules: {
     user,
