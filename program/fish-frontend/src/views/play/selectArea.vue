@@ -43,8 +43,7 @@ export default {
       ],
       currentIndex: 0, // 当前展示地图数组的索引
       displayCount: 3, // 每次展示的地图数量
-      master: false,
-      mapId: ''
+      master: false
     }
   },
   computed: {
@@ -75,13 +74,17 @@ export default {
       return store.getters.roomId
     },
     map() {
-      return localStorage.getItem('mapId')
+      return store.getters.mapId
     }
   },
   watch: {
     // 监听map的变化，如果map不为0，说明房主选择了地图，此时找到对应的map，将其slected置为true
     map() {
       if(this.map != '0') {
+        // 先清空所有的slected
+        this.maps.forEach((item) => {
+          item.slected = false
+        })
         this.maps.forEach((item) => {
           if(item.id == this.map) {
             item.slected = true
@@ -134,23 +137,16 @@ export default {
       } else {
         mapId = this.slection[0].id
       }
+      this.socket.emit('certainMap', parseInt(this.roomId))
       this.$router.push({ path: '/role', query: { mapid: mapId } })
     }
   },
   created () {
-    localStorage.setItem('mapId', '0')
     if(localStorage.getItem('isMaster') == 'true') {
       this.master = true
     } else {
       this.master = false
     }
-    this.socket.on('message', (data) => {
-      if(data.msg == '选择地图成功!' && localStorage.getItem('isMaster') == 'true') {
-        const mapId = toString(data.map)
-        // 寻找对应maoId的map，将其slected置为true
-        this.mapId = mapId
-      }
-    })
   },
 }
 </script>
@@ -215,7 +211,7 @@ export default {
       margin-right: 4vw;
       height: 45vh;
       width: 45vh;
-      background-color: red;
+      background-color: #f3f1f1;
       cursor: pointer;
       &:nth-child(4) {
         margin-right: 0;

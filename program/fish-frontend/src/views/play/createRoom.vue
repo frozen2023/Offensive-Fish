@@ -199,6 +199,7 @@ export default {
       await getRoomInfo(this.roomInfo.roomId)
       .then((res) => {
         this.master.name = res.data.msg.roomOwnerName
+        localStorage.setItem('playerName', this.master.name)
         this.roomInfo = res.data.msg
       })
       .catch((err) => {
@@ -304,8 +305,33 @@ export default {
             store.commit('socket/setRoomId', this.roomInfo.roomId)
             this.$router.push('/area')
           }
-          if(data.msg == '选择地图成功!' && localStorage.getItem('isMaster') == 'false') {
-            localStorage.setItem('mapId', data.map)
+          if(data.msg == '选择地图成功!') {
+            store.commit('socket/setMap', data.map)
+          }
+          if(data.msg == '开始选择英雄!' && localStorage.getItem('isMaster') == 'false') {
+            this.$router.push('/role')
+          }
+          if(data.msg == '选择英雄成功!') {
+            if(localStorage.getItem('isMaster') == 'false') {
+              if(data.userId == this.masterId) {
+                store.commit('socket/setPlayerRole', data.role)
+              } else {
+                store.commit('socket/setMyRole', data.role)
+              }
+            } else {
+              if(data.userId == this.masterId) {
+                store.commit('socket/setMyRole', data.role)
+              } else {
+                store.commit('socket/setPlayerRole', data.role)
+              }
+            }
+          }
+          if(data.msg == '发送消息成功!') {
+            if(data.userName == this.masterId) {
+              store.commit('socket/setChatMessages', { text: data.data, position: 'right' })
+            } else {
+              store.commit('socket/setChatMessages', { text: data.data, position: 'left' })
+            }
           }
         })
         this.socket.on('error', (error) => {
