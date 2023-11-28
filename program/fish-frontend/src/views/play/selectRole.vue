@@ -18,7 +18,8 @@
       </div>
       <div class="role_body">
         <div class="role_wrap" v-for="(role,index) in roles" :key="index" @click="choose(index)">
-          <i class="slected" v-show="role.slected" ref="slectedLable">已选择</i>
+          <i class="slected" v-show="players[0].selection == role.name?true:false" ref="slectedLable">已选择</i>
+          <i class="slected_o" v-show="players[1].selection == role.name?true:false" ref="slectedLable_o">已选择</i>
           <div class="role_wrap_img"><img :src="role.img" alt=""></div>
           <div class="role_wrap_name">{{ role.name }}</div>
           <div class="role_wrap_desc">{{ role.desc }}</div>
@@ -62,8 +63,8 @@ export default {
         { id: 2, name: '', master: false, pos: 'P2', selection: '' },
       ],
       roles: [
-        { img: require('@/assets/images/1.png'), slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
-        { img: require('@/assets/images/2.png'), slected: false, name: '鳐鱼', desc: '变异之处：这种鳐鱼由于核污染而发光，身体覆盖着发光的鳞片。它们的扁平体形使它们擅长在海底滑行，并且拥有特殊的治疗能力。', ability: '特殊能力：光线鳐鱼可以发出闪亮的光束，使周围的水域一片明亮。这可以用来吸引其他鱼，使猎食更容易。此外，它可以治疗他的小伙伴。' }
+        { id: 1, img: require('@/assets/images/1.png'), slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
+        { id: 2, img: require('@/assets/images/2.png'), slected: false, name: '鳐鱼', desc: '变异之处：这种鳐鱼由于核污染而发光，身体覆盖着发光的鳞片。它们的扁平体形使它们擅长在海底滑行，并且拥有特殊的治疗能力。', ability: '特殊能力：光线鳐鱼可以发出闪亮的光束，使周围的水域一片明亮。这可以用来吸引其他鱼，使猎食更容易。此外，它可以治疗他的小伙伴。' }
       ],
       totalSecond: 20, // 总秒数
       second: 20, // 当前秒数，开定时器对 second--
@@ -71,13 +72,16 @@ export default {
       text: '游戏即将开始',
       nowId: 1, // 当前页面玩家id
       sendText: '',
-      chatMessages: [
-        { position: 'left', text: '小宝贝', id: 1 },
-        { position: 'right', text: '干嘛', id: 2 },
-      ]
+      // chatMessages: [
+      //   { position: 'left', text: '小宝贝', id: 1 }
+      // ],
+      isMaster: false
     }
   },
   computed: {
+    chatMessages() {
+      return store.getters.chatMessages
+    },
     nowPlayerPos() {
       return this.players.find((item) => {
         return item.id === this.nowId
@@ -87,41 +91,60 @@ export default {
       return this.players.find((item) => {
         return item.id === this.nowId
       }).selection
+    },
+    roomId() {
+      return store.getters.roomId
+    },
+    masterRoleId() {
+      return store.getters.masterRoleId
+    },
+    playerRoleId() {
+      return store.getters.playerRoleId
+    },
+    socket() {
+      return store.getters.socket
     }
   },
-  watch: {},
+  watch: {
+    masterRoleId(val) {
+      if(val !== '0') {
+        if(this.isMaster == 'false') {
+          this.players[0].selection = this.roles[val - 1].name
+        }
+      }
+    },
+    playerRoleId(val) {
+      if(val !== '0') {
+        if(this.isMaster == 'true') {
+          this.players[1].selection = this.roles[val - 1].name
+        }
+      }
+    }
+  },
   methods: {
     choose(index) {
-      this.roles.forEach((item) => {
-        item.slected = false
-      })
-      // 根据当前页面玩家的pos，为P1还是P2，决定i标签的背景颜色
-      if (this.nowPlayerPos === 'P1') {
-        this.$refs.slectedLable[index].style.backgroundColor = '#c73434'
-      } else {
-        this.$refs.slectedLable[index].style.backgroundColor = '#d0d85d'
-      }
-      this.roles[index].slected = true
       this.players.forEach((item) => {
-        if (item.id === this.nowId) {
+        if (item.id == this.nowId) {
           item.selection = this.roles[index].name
         }
       })
+      const roleId = this.roles[index].id
+      this.socket.emit('chooseRole', parseInt(this.roomId), parseInt(roleId))
     },
     sendMsg() {
-      this.chatMessages.push({
-        text: this.sendText,
-        position: 'right' // 添加消息的位置，你可以根据需要调整
-      })
+      this.socket.emit('sendRoomMessage', parseInt(this.roomId), this.sendText)
       this.sendText = '' // 清空发送文本框
     },
   },
   created () {
-    if(localStorage.getItem('isMaster') === 'true') {
+    this.isMaster = localStorage.getItem('isMaster')
+    if(this.isMaster === 'true') {
+      this.nowId = 1
       this.players[0].name = store.getters.userName
-      // this.players[1].name = localStorage.getItem('otherName')
+      this.players[1].name = localStorage.getItem('playerName')
     } else {
-      // this.players[0].name = localStorage.getItem('otherName')
+      this.nowId = 2
+      this.players[0].name = localStorage.getItem('playerName')
       this.players[1].name = store.getters.userName
     }
     if (!this.timer && this.second === this.totalSecond) {
@@ -132,6 +155,7 @@ export default {
           this.timer = null // 重置定时器 id
           this.second = this.totalSecond // 归位
           this.text = '游戏开始'
+          this.$router.push('/game')
         }
       }, 1000)
     }
@@ -243,7 +267,7 @@ export default {
     &_desc {
       margin-bottom: 1vh;
     }
-    .slected {
+    .slected, .slected_o {
       position: absolute;
       right: -5vh;
       top: -5vh;
@@ -253,6 +277,11 @@ export default {
       border-radius: 50%;
       text-align: center;
       .pxfont(22);
+      background-color: #c73434;
+    }
+    .slected_o {
+      left: -5vh;
+      background-color: #d0d85d;
     }
   }
 }
