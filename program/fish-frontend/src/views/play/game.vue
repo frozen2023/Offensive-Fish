@@ -45,7 +45,10 @@ export default {
       },
       animationId: null,
       w: 35,
-      h: 20
+      h: 20,
+      fishTimer: null, // 随机生成鱼的定时器
+      randomInterval: null, // 随机请求时间间隔
+      fishes: [], // 保存所有人机鱼的数组
     }
   },
   computed: {
@@ -220,7 +223,39 @@ export default {
       }
       this.drawFish()
     })
+    // 监听 fishSpace 事件
+    this.socket.on('fishSpace', (data) => {
+      // 处理从服务器广播的鱼的生成信息
+      const { lr, SerialNum, y } = data
+      const x = lr === 0 ? -50 : this.canvas.width + 50 // 从左或右边界出现
+      const speed = 0.1
+      const fish = {
+        img: new Image(),
+        x,
+        y: this.canvas.height * y,
+        speed,
+        lr,
+        SerialNum,
+      }
+      // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
+      fish.img.src = fish1
+      this.fishes.push(fish)
+      // 通过定时器移动鱼
+      setInterval(() => {
+        fish.x += fish.speed * (lr === 0 ? 1 : -1)
+        // 如果鱼超出边界，可以在这里处理
+      }, 1000 / 60) // 60帧每秒
+      this.randomInterval = Math.floor(Math.random() * (3000 - 1000 + 1) + 1000) // 随机间隔
+    })
+    // 设置定时器，在 created 时触发，每隔 1s 到 3s 向 socket 发起 emit 事件
+    this.fishTimer = setInterval(() => {
+      this.socket.emit('fish', this.roomId)
+    }, randomInterval)
     store.commit('socket/setSocket', this.socket)
+  },
+  beforeDestroy() {
+    // 清除定时器
+    clearInterval(this.fishTimer)
   },
 }
 </script>
