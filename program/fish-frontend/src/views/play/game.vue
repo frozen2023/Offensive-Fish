@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import fish1_turn from '@/assets/images/1.png'
+import fish1 from '@/assets/images/1.png'
 import fish2 from '@/assets/images/2.png'
-import fish1 from '@/assets/images/1_turn.png'
+import fish1_turn from '@/assets/images/1_turn.png'
 import fish2_turn from '@/assets/images/2_turn.png'
 import store from '@/store'
 export default {
@@ -81,7 +81,7 @@ export default {
       }
       role.img = img
     },
-    drawFish() {
+    drawFish(fishInfo) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
       if(this.master.moving.left) {
         this.master.img.src = fish1_turn
@@ -93,9 +93,15 @@ export default {
       } else if(this.player.moving.right) {
         this.player.img.src = fish2
       }
+      if(fishInfo) {
+        this.drawOtherFish(fishInfo)
+      }
       this.ctx.drawImage(this.master.img, this.master.x , this.master.y , this.w, this.h)
       this.ctx.drawImage(this.player.img, this.player.x , this.player.y , this.w, this.h)
-      this.ctx.fill()
+      // this.ctx.fill()
+    },
+    drawOtherFish(fishInfo) {
+      this.ctx.drawImage(fishInfo.img, fishInfo.x , fishInfo.y , this.w, this.h)
     },
     handleKeyDown(event) {
       let role
@@ -169,7 +175,7 @@ export default {
       }
       // 发送移动事件到其他玩家
       let pos = JSON.stringify({ x: role.x, y: role.y })
-      // this.socket.emit('move', this.roomId, pos)
+      this.socket.emit('move', this.roomId, pos)
 
       this.drawFish()
     },
@@ -224,33 +230,30 @@ export default {
       this.drawFish()
     })
     // 监听 fishSpace 事件
-    this.socket.on('fishSpace', (data) => {
+    this.socket.on('fish', (data) => {
       // 处理从服务器广播的鱼的生成信息
-      const { lr, SerialNum, y } = data
-      const x = lr === 0 ? -50 : this.canvas.width + 50 // 从左或右边界出现
-      const speed = 0.1
-      const fish = {
-        img: new Image(),
-        x,
-        y: this.canvas.height * y,
-        speed,
-        lr,
-        SerialNum,
-      }
+      console.log(data)
+      let { lr, SerialNum, y } = data
+      let x = lr === 0 ? -35 : this.canvas.width + 35 // 从左或右边界出现
+      let speed = 0.1
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
+      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null }
       fish.img.src = fish1
-      this.fishes.push(fish)
       // 通过定时器移动鱼
-      setInterval(() => {
+      fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
+        this.drawFish(fish)
         // 如果鱼超出边界，可以在这里处理
-      }, 1000 / 60) // 60帧每秒
-      this.randomInterval = Math.floor(Math.random() * (3000 - 1000 + 1) + 1000) // 随机间隔
+      }, 1000 / 1000) // 60帧每秒
+      this.fishes.push(fish)
+      this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
     })
-    // 设置定时器，在 created 时触发，每隔 1s 到 3s 向 socket 发起 emit 事件
-    this.fishTimer = setInterval(() => {
-      this.socket.emit('fish', this.roomId)
-    }, randomInterval)
+    // 设置定时器，在 created 时触发，每隔 2s 到 4s 向 socket 发起 emit 事件
+    this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
+    // this.fishTimer = setInterval(() => {
+      // console.log(this.randomInterval)
+      this.socket.emit('fishSpace', this.roomId)
+    // }, this.randomInterval)
     store.commit('socket/setSocket', this.socket)
   },
   beforeDestroy() {
