@@ -7,8 +7,8 @@
       <div class="online">
         <div class="online_title">在线</div>
         <div class="online_list">
-          <div class="online_item" v-for="(item, index) in onlineList" :key="index">
-            <div class="online_item_name">{{item.nickName}}</div>
+          <div class="online_item" v-for="(item, index) in onlineList" :key="index" :v-if="friList">
+            <div class="online_item_name">{{item.name}}</div>
             <button class="online_item_invite" @click="invite()">邀请</button>
           </div>
         </div>
@@ -17,7 +17,7 @@
         <div class="offline_title">离线</div>
         <div class="offline_list">
           <div class="offline_item" v-for="(item, index) in offlineList" :key="index">
-            <div class="offline_item_name">{{item.nickName}}</div>
+            <div class="offline_item_name">{{item.name}}</div>
           </div>
         </div>
       </div>
@@ -32,21 +32,6 @@ export default {
   data () {
     return {
       friList: [
-        { id: 1, nickName: '玩家1', isOnline: true },
-        { id: 2, nickName: '玩家2', isOnline: false },
-        { id: 3, nickName: '玩家3', isOnline: true },
-        { id: 4, nickName: '玩家4', isOnline: false },
-        { id: 5, nickName: '玩家5', isOnline: true },
-        { id: 6, nickName: '玩家6', isOnline: true },
-        { id: 7, nickName: '玩家7', isOnline: false },
-        { id: 8, nickName: '玩家8', isOnline: true },
-        { id: 9, nickName: '玩家9', isOnline: false },
-        { id: 10, nickName: '玩家10', isOnline: true },
-        { id: 11, nickName: '玩家11', isOnline: true },
-        { id: 12, nickName: '玩家12', isOnline: false },
-        { id: 13, nickName: '玩家13', isOnline: true },
-        { id: 14, nickName: '玩家14', isOnline: false },
-        { id: 15, nickName: '玩家15', isOnline: true }
       ],
     }
   },
@@ -60,10 +45,10 @@ export default {
   },
   computed: {
     onlineList () {
-      return this.friList.filter(item => item.isOnline)
+      return this.friList.filter(item => item.status)
     },
     offlineList () {
-      return this.friList.filter(item => !item.isOnline)
+      return this.friList.filter(item => !item.status)
     }
   },
   watch: {},
@@ -73,7 +58,7 @@ export default {
     },
     async getFriList() {
       await getFriendList().then((res) => {
-        console.log(res)
+        this.friList = res.data
       })
       .catch((err) => {
         console.log(err)

@@ -15,17 +15,25 @@
       </div>
     </div>
     <div class="area_foot">
-      <button class="area_foot_confirm" @click="confirm()">{{  hasSlection?'确认选择':'随机选择' }}</button>
-      <button class="area_foot_return" @click="doBack()">返回</button>
+      <button class="area_foot_confirm" @click="confirm()" v-if="master">{{  hasSlection?'确认选择':'随机选择' }}</button>
+      <button class="area_foot_return" @click="doBack()" ref="backBtn" :style="master?margin:nomargin">返回</button>
     </div>
   </div>
 </template>
 
 <script>
+import io from 'socket.io-client'
+import store from '@/store'
 export default {
   name: 'selectArea',
   data () {
     return {
+      margin: {
+        marginLeft: '5vw'
+      },
+      nomargin: {
+        marginLeft: '0'
+      },
       maps: [
         { id: 1, name: '1', slected: false },
         { id: 2, name: '2', slected: false },
@@ -34,7 +42,8 @@ export default {
         { id: 5, name: '5', slected: false }
       ],
       currentIndex: 0, // 当前展示地图数组的索引
-      displayCount: 3 // 每次展示的地图数量
+      displayCount: 3, // 每次展示的地图数量
+      master: false
     }
   },
   computed: {
@@ -51,9 +60,39 @@ export default {
       return this.maps.filter((item) => {
         return item.slected
       })
+    },
+    isMaster() {
+      if(localStorage.getItem('isMaster') == 'false') {
+        return false
+      }
+      return true
+    },
+    socket() {
+      return store.getters.socket
+    },
+    roomId() {
+      return store.getters.roomId
+    },
+    map() {
+      return store.getters.mapId
     }
   },
-  watch: {},
+  watch: {
+    // 监听map的变化，如果map不为0，说明房主选择了地图，此时找到对应的map，将其slected置为true
+    map() {
+      if(this.map != '0') {
+        // 先清空所有的slected
+        this.maps.forEach((item) => {
+          item.slected = false
+        })
+        this.maps.forEach((item) => {
+          if(item.id == this.map) {
+            item.slected = true
+          }
+        })
+      }
+    }
+  },
   methods: {
     left() {
       if (this.currentIndex > 0) {
@@ -66,6 +105,14 @@ export default {
       }
     },
     slected(id) {
+      if(!this.master) {
+        this.message({
+          message: '你不是房主噢，不能选择地图~~~',
+          type: 'info',
+          duration: 2000
+        })
+        return
+      }
       this.maps.forEach((item) => {
         if (item.id === id) {
           item.slected = true
@@ -73,9 +120,14 @@ export default {
           item.slected = false
         }
       })
+      this.socket.emit('chooseMap', parseInt(this.roomId), parseInt(id))
     },
     doBack() {
-
+      this.$message({
+        message: '不能返回噢！！！游戏开始啦！！！不要抛弃你的队友！！！',
+        type: 'warning',
+        duration: 2200
+      })
     },
     confirm() {
       let mapId = ''
@@ -85,10 +137,17 @@ export default {
       } else {
         mapId = this.slection[0].id
       }
+      this.socket.emit('certainMap', parseInt(this.roomId))
       this.$router.push({ path: '/role', query: { mapid: mapId } })
     }
   },
-  created () {},
+  created () {
+    if(localStorage.getItem('isMaster') == 'true') {
+      this.master = true
+    } else {
+      this.master = false
+    }
+  },
 }
 </script>
 <style scoped lang='less'>
@@ -152,7 +211,7 @@ export default {
       margin-right: 4vw;
       height: 45vh;
       width: 45vh;
-      background-color: red;
+      background-color: #f3f1f1;
       cursor: pointer;
       &:nth-child(4) {
         margin-right: 0;
