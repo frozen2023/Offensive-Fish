@@ -28,12 +28,12 @@ public class RoomController {
         return roomService.selectAllRoom();
     }//返回所有的房间,房间返回的类型为RetRoom
     @RequestMapping("/entryRoom")
-    public Map<String,Object> entryRoom(String code,int roomId,String playerId){
-        return roomService.entryRoom(code,roomId,playerId);
+    public Map<String,Object> entryRoom(String code,String playerId){
+        return roomService.entryRoom(code,playerId);
     }
     @RequestMapping("/ExitRoom")
-    public Map<String,Object> ExitRoom(int roomId){
-        return roomService.ExitRoom(roomId);
+    public Map<String,Object> ExitRoom(int roomId,String userId){
+        return roomService.ExitRoom(roomId,userId);
     }
     @RequestMapping("/getRoomId")
     public int getRoomId(String code){

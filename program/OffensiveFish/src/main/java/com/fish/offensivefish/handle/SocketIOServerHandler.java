@@ -9,9 +9,13 @@ import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fish.offensivefish.Cache.ClientCache;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.UUID;
 
@@ -37,10 +41,9 @@ public class SocketIOServerHandler {
         String userId = client.getHandshakeData().getSingleUrlParam("userId");
         //同一个页面sessionid一样的
         UUID sessionId = client.getSessionId();
-
         //保存用户的信息在缓存里面
         clientCache.saveClient(userId,sessionId,client);
-        client.sendEvent("message", "onConnect back");
+        client.sendEvent("message", sessionId);
         log.info("客户端:" + client.getRemoteAddress() + "  sessionId:" + client.getSessionId() +" userId: "+ userId+ "已连接");
 //        if(ackRequest.isAckRequested()){
 //            //返回给客户端，说我接收到了
@@ -68,7 +71,4 @@ public class SocketIOServerHandler {
         log.info("SocketIOServerHandler-用户id:{},sessionId:{},关闭连接成功",userId,sessionId);
     }
 
-
-
 }
-

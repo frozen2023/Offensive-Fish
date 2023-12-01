@@ -6,6 +6,7 @@ mybatis:
 server:
   port: 9001
   max-http-header-size: 5242880
+
 ############## Sa-Token ?? (??: https://sa-token.cc) ##############
 sa-token:
   # token?? (????cookie??)
@@ -22,7 +23,13 @@ sa-token:
   token-style: uuid
   # ????????
   is-log: false
+  # application.yml
+  # application.yml
+
+
 spring:
+    websocket:
+       allowed-origin: "*"
     servlet:
       multipart:
         max-file-size: 500MB #???????????
@@ -30,10 +37,6 @@ spring:
     jackson: #?????????
       date-format: yyyy-MM-dd HH:mm:ss
       time-zone: GMT+8
-    mvc:
-      hiddenmethod:
-        filter:
-          enabled: true
 
     datasource:
       username: root
@@ -47,7 +50,7 @@ spring:
 #自定义socketio配置,你可以直接硬编码，看个人喜好
 socketio:
   # socketio请求地址
-  host: 10.132.62.87
+  host: 10.198.134.62
   # socketio端口
   port: 9999
   # 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器

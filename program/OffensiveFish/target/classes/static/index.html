@@ -16,8 +16,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>SocketIO客户端测试环境</title>
     <base>
-    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/socket.io/2.1.1/socket.io.js"></script>
     <style>
         body {
             padding: 20px;
@@ -145,74 +143,78 @@
     }
     });
   function connect(url) {
-    //socket = io.connect(url, opts);
-    socket = io.connect(url)
-    //socket.nsp = "/test";//定义命名空间
-    console.log(socket)
-    //监听本次连接回调函数
-    socket.on('connect', function () {
-        socket.send("hello");
-      isConnected = true;
-      console.log("连接成功");
-      serverOutput('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>+连接成功</span>');
-      errorCount = 0;
-    });
-    //监听消息
-    socket.on('message', function (data) {
-      output('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + data + ' </span>');
-      console.log(data);
-    });
+      // 使用 io() 函数创建 socket 对象
+      socket = io.connect(url,{transports:['websocket','xhr-polling','jsonp-polling']});
+      // 监听连接事件
+      socket.on('connect', () => {
+          console.log("连接成功");
+          isConnected = true;
+          serverOutput('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>+连接成功</span>');
+          errorCount = 0;
+      });
 
-    //监听断开
-    socket.on('disconnect', function () {
-      isConnected = false;
-      console.log("连接断开");
-      serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '已下线! </span>');
-    });
-    //监听断开错误
-    socket.on('connect_error', function (data) {
-      serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>;' + '连接错误-' + data + ' </span>');
-      errorCount++;
-      if (errorCount >= maxError) {
-        socket.disconnect();
-      }
-    });
-    //监听连接超时
-    socket.on('connect_timeout', function (data) {
-      serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '连接超时-' + data + ' </span>');
-      errorCount++;
-      if (errorCount >= maxError) {
-        socket.disconnect();
-      }
-    });
-    //监听错误
-    socket.on('error', function (data) {
-      serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '系统错误-' + data + ' </span>');
-      errorCount++;
-      if (errorCount >= maxError) {
-        socket.disconnect();
-      }
-    });
-    socket.on('antherMove', function (userId,data) {
-        if (userId !== $("#userId").val()) {
-        console.log("antherMove:" + data)
-        var obj = JSON.parse(data);
-        fishX1 = obj.x;
-        fishY1 = obj.y;
-        drawFish();
-    }
-    });
-    socket.on('ack', function (data) {
+      // 监听消息事件
+      socket.on('message', (data) => {
+          output('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + data + ' </span>');
+          console.log(data);
+      });
 
-      console.log("ack:" + data)
-      var str = '消息发送失败';
-      if (data == 1) {
-        str = '消息发送成功';
-      }
-      serverOutput('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + str + ' </span>');
+      // 监听断开事件
+      socket.on('disconnect', () => {
+          isConnected = false;
+          console.log("连接断开");
+          serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '已下线！ </span>');
+      });
 
-    });
+      // 监听连接错误事件
+      socket.on('connect_error', (data) => {
+          serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>;' + '连接错误-' + data + ' </span>');
+          errorCount++;
+          if (errorCount >= maxError) {
+              socket.disconnect();
+          }
+      });
+
+      // 监听连接超时事件
+      socket.on('connect_timeout', (data) => {
+          serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '连接超时-' + data + ' </span>');
+          errorCount++;
+          if (errorCount >= maxError) {
+              socket.disconnect();
+          }
+      });
+
+      // 监听错误事件
+      socket.on('error', (data) => {
+          serverOutput('<span class="disconnect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + '系统错误-' + data + ' </span>');
+          errorCount++;
+          if (errorCount >= maxError) {
+              socket.disconnect();
+          }
+      });
+
+      // 监听其他事件
+      socket.on('antherMove', (userId, data) => {
+          if (userId !== $("#userId").val()) {
+              console.log("antherMove:" + data);
+              var obj = JSON.parse(data);
+              fishX1 = obj.x;
+              fishY1 = obj.y;
+              drawFish();
+          }
+      });
+
+      // 监听确认事件
+      socket.on('ack', (data) => {
+          console.log("ack:" + data);
+          var str = '消息发送失败';
+          if (data == 1) {
+              str = '消息发送成功';
+          }
+          serverOutput('<span class="connect-msg"><font color="blue">' + getNowTime() + '&nbsp;</font>' + str + ' </span>');
+      });
   }
+
   function output(message) {
     var element = $("<div>" + " " + message + "</div>");
     $('#console').prepend(element);
@@ -259,6 +261,12 @@
         console.log("ack1:"+data1);
         console.log("ack2:"+data2);
       });
+    }
+    else if(socketEvent==="prepare"){
+        socket.emit(socketEvent,roomId,function(data1,data2){
+            console.log("ack1:"+data1);
+            console.log("ack2:"+data2);
+        });
     }
     else {socket.emit(socketEvent,content,function(data1,data2){
       console.log("ack1:"+data1);
