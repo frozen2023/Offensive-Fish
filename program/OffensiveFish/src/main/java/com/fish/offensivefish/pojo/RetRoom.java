@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 public class RetRoom{
     int roomId;
     String roomOwnerId;//房主账号
-    String rommOwnerName;//房主姓名
+    String roomOwnerName;//房主姓名
+    String playerId;//第二个人的id
     int numbers;
     int isOpen;//是否开始运行游戏
 }
