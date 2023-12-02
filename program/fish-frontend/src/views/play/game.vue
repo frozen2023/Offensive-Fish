@@ -3,6 +3,9 @@
     <canvas id="fishCanvas" ref="fishCanvas">
       您的浏览器不支持canvas,请更换浏览器
     </canvas>
+    <canvas id="otherfishCanvas" ref="otherfishCanvas">
+      您的浏览器不支持canvas,请更换浏览器
+    </canvas>
   </div>
 </template>
 
@@ -19,6 +22,8 @@ export default {
       isMaster: false,
       canvas: null,
       ctx: null,
+      fishCanvas: null,
+      fishCtx: null,
       player: {
         img: null,
         x: 0,
@@ -93,15 +98,16 @@ export default {
       } else if(this.player.moving.right) {
         this.player.img.src = fish2
       }
-      if(fishInfo) {
-        this.drawOtherFish(fishInfo)
-      }
+      // if(fishInfo) {
+      //   this.drawOtherFish(fishInfo)
+      // }
       this.ctx.drawImage(this.master.img, this.master.x , this.master.y , this.w, this.h)
       this.ctx.drawImage(this.player.img, this.player.x , this.player.y , this.w, this.h)
-      // this.ctx.fill()
+      this.ctx.fill()
     },
     drawOtherFish(fishInfo) {
-      this.ctx.drawImage(fishInfo.img, fishInfo.x , fishInfo.y , this.w, this.h)
+      this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
+      this.fishCtx.drawImage(fishInfo.img, fishInfo.x , fishInfo.y , this.w, this.h)
     },
     handleKeyDown(event) {
       let role
@@ -198,7 +204,9 @@ export default {
   },
   mounted() {
     this.canvas = this.$refs.fishCanvas
+    this.fishCanvas = this.$refs.otherfishCanvas
     this.ctx = this.canvas.getContext('2d')
+    this.fishCtx = this.fishCanvas.getContext('2d')
     this.master.x = this.canvas.width / 3
     this.master.y = this.canvas.height / 4
     this.player.x = this.canvas.width / 3*2
@@ -235,25 +243,27 @@ export default {
       console.log(data)
       let { lr, SerialNum, y } = data
       let x = lr === 0 ? -35 : this.canvas.width + 35 // 从左或右边界出现
-      let speed = 0.1
+      let speed = 0.3
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
       let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null }
       fish.img.src = fish1
       // 通过定时器移动鱼
       fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
-        this.drawFish(fish)
+        this.drawOtherFish(fish)
         // 如果鱼超出边界，可以在这里处理
-      }, 1000 / 1000) // 60帧每秒
+      }, 1000 / 80) // 60帧每秒
       this.fishes.push(fish)
       this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
     })
     // 设置定时器，在 created 时触发，每隔 2s 到 4s 向 socket 发起 emit 事件
     this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
-    // this.fishTimer = setInterval(() => {
-      // console.log(this.randomInterval)
-      this.socket.emit('fishSpace', this.roomId)
-    // }, this.randomInterval)
+    if(this.isMaster) {
+      // this.fishTimer = setInterval(() => {
+        // console.log(this.randomInterval)
+        this.socket.emit('fishSpace', this.roomId)
+      // }, this.randomInterval)
+    }
     store.commit('socket/setSocket', this.socket)
   },
   beforeDestroy() {
@@ -269,7 +279,15 @@ export default {
   height: 100vh;
 }
 #fishCanvas {
+  position: relative;
   display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+#otherfishCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
 }
