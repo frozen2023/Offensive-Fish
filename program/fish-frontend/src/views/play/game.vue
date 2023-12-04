@@ -86,7 +86,7 @@ export default {
       }
       role.img = img
     },
-    drawFish(fishInfo) {
+    drawFish() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
       if(this.master.moving.left) {
         this.master.img.src = fish1_turn
@@ -98,16 +98,22 @@ export default {
       } else if(this.player.moving.right) {
         this.player.img.src = fish2
       }
-      // if(fishInfo) {
-      //   this.drawOtherFish(fishInfo)
-      // }
       this.ctx.drawImage(this.master.img, this.master.x , this.master.y , this.w, this.h)
       this.ctx.drawImage(this.player.img, this.player.x , this.player.y , this.w, this.h)
       this.ctx.fill()
     },
     drawOtherFish(fishInfo) {
+      const offscreenCanvas = document.createElement('canvas')
+      offscreenCanvas.width = this.fishCanvas.width
+      offscreenCanvas.height = this.fishCanvas.height
+      const offscreenCtx = offscreenCanvas.getContext('2d')
+
+      for (const fish of this.fishes) {
+        offscreenCtx.drawImage(fish.img, fish.x, fish.y, this.w, this.h)
+      }
+
       this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
-      this.fishCtx.drawImage(fishInfo.img, fishInfo.x , fishInfo.y , this.w, this.h)
+      this.fishCtx.drawImage(offscreenCanvas, 0, 0)
     },
     handleKeyDown(event) {
       let role
@@ -182,7 +188,18 @@ export default {
       // 发送移动事件到其他玩家
       let pos = JSON.stringify({ x: role.x, y: role.y })
       this.socket.emit('move', this.roomId, pos)
-
+      let roler = { x: role.x, y: role.y, img: role.img }
+      for (let i = 0; i < this.fishes.length; i++) {
+        const fish = this.fishes[i]
+        if (this.checkCollision(roler, fish)) {
+          this.eatFish(fish)
+          this.socket.emit('eatFish', this.roomId, i)
+          clearInterval(this.fishes[i].fishTimer)
+          this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
+          this.fishes.splice(i, 1)
+          i-- // 更新索引，因为数组长度已经改变
+        }
+      }
       this.drawFish()
     },
     startAnimation() {
@@ -200,6 +217,18 @@ export default {
     stopAnimation() {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
+    },
+    checkCollision(obj1, obj2) {
+      return (
+        obj1.x < obj2.x + 35 &&
+        obj1.x + 35 > obj2.x &&
+        obj1.y < obj2.y + 20 &&
+        obj1.y + 20 > obj2.y
+      )
+    },
+    eatFish(fish) {
+      // 处理吃到鱼的逻辑
+      console.log('吃到鱼了！', fish)
     },
   },
   mounted() {
@@ -244,17 +273,36 @@ export default {
       let { lr, SerialNum, y } = data
       let x = lr === 0 ? -35 : this.canvas.width + 35 // 从左或右边界出现
       let speed = 0.3
+      if(y > 0.86) {
+        y = 0.86
+      }
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
       let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null }
-      fish.img.src = fish1
+      if(lr === 0) {
+        fish.img.src = fish1
+      } else {
+        fish.img.src = fish1_turn
+      }
       // 通过定时器移动鱼
       fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
+        if(fish.x < -35 || fish.x > this.canvas.width + 35) {
+          clearInterval(fish.fishTimer)
+          this.fishes.splice(this.fishes.indexOf(fish), 1)
+        }
+        console.log("鱼鱼:", fish.x)
         this.drawOtherFish(fish)
         // 如果鱼超出边界，可以在这里处理
-      }, 1000 / 80) // 60帧每秒
+      }, 1000 / 100) // 60帧每秒
       this.fishes.push(fish)
       this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
+    })
+    // 监听 eatFish 事件
+    this.socket.on('anotherEat', (userId, index) => {
+      // 处理从服务器广播的鱼的消失信息
+      if(userId !== this.loginId) {
+        this.fishes.splice(index, 1)
+      }
     })
     // 设置定时器，在 created 时触发，每隔 2s 到 4s 向 socket 发起 emit 事件
     this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
