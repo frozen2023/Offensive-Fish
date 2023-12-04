@@ -66,8 +66,8 @@ export default {
         { id: 1, img: require('@/assets/images/1.png'), slected: false, name: '金枪鱼', desc: '变异之处：这种金枪鱼变异出令人惊叹的超高速度。它们的身体线条更加流线型，鳍和鳍尾变得更大。', ability: '特殊能力：雷速金枪鱼具有闪电一般的加速能力，能够在水中迅速穿梭。它们可以迅速追赶其他鱼，或者逃脱捕食者。此外，它们可以在快速移动时创建出引力漩涡，吸引附近的小鱼，为自己提供更多的食物来源。' },
         { id: 2, img: require('@/assets/images/2.png'), slected: false, name: '鳐鱼', desc: '变异之处：这种鳐鱼由于核污染而发光，身体覆盖着发光的鳞片。它们的扁平体形使它们擅长在海底滑行，并且拥有特殊的治疗能力。', ability: '特殊能力：光线鳐鱼可以发出闪亮的光束，使周围的水域一片明亮。这可以用来吸引其他鱼，使猎食更容易。此外，它可以治疗他的小伙伴。' }
       ],
-      totalSecond: 20, // 总秒数
-      second: 20, // 当前秒数，开定时器对 second--
+      totalSecond: 10, // 总秒数
+      second: 10, // 当前秒数，开定时器对 second--
       timer: null, // 定时器 id
       text: '游戏即将开始',
       nowId: 1, // 当前页面玩家id
