@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import io from 'socket.io-client'
 import store from '@/store'
 export default {
   name: 'selectArea',

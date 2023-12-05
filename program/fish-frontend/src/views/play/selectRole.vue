@@ -72,9 +72,6 @@ export default {
       text: '游戏即将开始',
       nowId: 1, // 当前页面玩家id
       sendText: '',
-      // chatMessages: [
-      //   { position: 'left', text: '小宝贝', id: 1 }
-      // ],
       isMaster: false
     }
   },
