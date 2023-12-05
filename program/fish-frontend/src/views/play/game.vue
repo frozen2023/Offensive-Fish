@@ -15,6 +15,7 @@ import fish2 from '@/assets/images/2.png'
 import fish1_turn from '@/assets/images/1_turn.png'
 import fish2_turn from '@/assets/images/2_turn.png'
 import store from '@/store'
+import { mapActions } from 'vuex'
 export default {
   name: 'game',
   data () {
@@ -29,6 +30,7 @@ export default {
         x: 0,
         y: 0,
         speed: 0.5,
+        health: 100,
         moving: {
           up: false,
           down: false,
@@ -41,6 +43,7 @@ export default {
         x: 0,
         y: 0,
         speed: 0.5,
+        health: 100,
         moving: {
           up: false,
           down: false,
@@ -48,6 +51,9 @@ export default {
           right: false,
         },
       },
+      scoreMaster: 0,
+      scorePlayer: 0,
+      eatKey: false,
       animationId: null,
       w: 35,
       h: 20,
@@ -75,8 +81,27 @@ export default {
       return 2
     }
   },
-  watch: {},
+  watch: {
+    // 监听master和player的血量，如果血量为0，游戏结束
+    'master.health': (val) => {
+      if(val <= 0) {
+        this.goSettle()
+      }
+    },
+    'player.health': (val) => {
+      if(val <= 0) {
+        this.goSettle()
+      }
+    }
+  },
   methods: {
+    goSettle() {
+      this.stopAnimation()
+      store.commit('socket/setScore', { role: 'master', score: this.scoreMaster })
+      store.commit('socket/setScore', { role: 'player', score: this.scorePlayer })
+      // this.socket.emit('gameOver', this.roomId)
+      // this.$router.push({ path: '/settlement' })
+    },
     initImage(roleId, flag) {
       const img = new Image()
       img.src = roleId == 1 ? fish1 : fish2
@@ -102,7 +127,7 @@ export default {
       this.ctx.drawImage(this.player.img, this.player.x , this.player.y , this.w, this.h)
       this.ctx.fill()
     },
-    drawOtherFish(fishInfo) {
+    drawOtherFish(fishInfo) { //双缓冲绘制鱼
       const offscreenCanvas = document.createElement('canvas')
       offscreenCanvas.width = this.fishCanvas.width
       offscreenCanvas.height = this.fishCanvas.height
@@ -121,6 +146,10 @@ export default {
         role = this.master
       } else {
         role = this.player
+      }
+      if(event.key === 'q' || event.key === 'Q') {
+        this.eatKey = true
+        console.log(event.key)
       }
       switch (event.key) {
         case 'ArrowUp':
@@ -145,6 +174,9 @@ export default {
         role = this.master
       } else {
         role = this.player
+      }
+      if(event.key === 'q' || event.key === 'Q') {
+        this.eatKey = false
       }
       switch (event.key) {
         case 'ArrowUp':
@@ -192,12 +224,11 @@ export default {
       for (let i = 0; i < this.fishes.length; i++) {
         const fish = this.fishes[i]
         if (this.checkCollision(roler, fish)) {
-          this.eatFish(fish)
-          this.socket.emit('eatFish', this.roomId, i)
-          clearInterval(this.fishes[i].fishTimer)
-          this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
-          this.fishes.splice(i, 1)
-          i-- // 更新索引，因为数组长度已经改变
+          fish.isIn = true
+          if(this.eatKey) { // 玩家主动吃鱼
+            this.eatFish(fish, i)
+            i-- // 更新索引，数组长度已经改变
+          }
         }
       }
       this.drawFish()
@@ -226,9 +257,19 @@ export default {
         obj1.y + 20 > obj2.y
       )
     },
-    eatFish(fish) {
-      // 处理吃到鱼的逻辑
-      console.log('吃到鱼了！', fish)
+    eatFish(fish, index) {
+      console.log('eat:', fish)
+      this.socket.emit('eatFish', this.roomId, index)
+      clearInterval(this.fishes[index].fishTimer)
+      this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
+      if(this.isMaster) {
+        this.scoreMaster += 1
+        store.commit('socket/setScore', { role: 'master', score: this.scoreMaster })
+      } else {
+        this.scorePlayer += 1
+        store.commit('socket/setScore', { role: 'player', score: this.scorePlayer })
+      }
+      this.fishes.splice(index, 1)
     },
   },
   mounted() {
@@ -277,7 +318,7 @@ export default {
         y = 0.86
       }
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
-      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null }
+      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null, eatTimer: null, isIn: false }
       if(lr === 0) {
         fish.img.src = fish1
       } else {
@@ -286,11 +327,27 @@ export default {
       // 通过定时器移动鱼
       fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
+        if(this.isIn && !this.eatKey) {
+          // 鱼攻击玩家的定时器
+          if(!fish.eatTimer) {
+            fish.eatTimer = setInterval(() => {
+              if(this.isMaster) {
+                this.master.health -= 10
+                // this.socket.emit('health', this.roomId, this.master.health)
+              } else {
+                this.player.health -= 10
+                // this.socket.emit('health', this.roomId, this.player.health)
+              }
+              // if(this.master.health <= 0 || this.player.health <= 0) {
+                // clearInterval(fish.eatTimer)
+              // }
+            }, 2000)
+          }
+        }
         if(fish.x < -35 || fish.x > this.canvas.width + 35) {
           clearInterval(fish.fishTimer)
           this.fishes.splice(this.fishes.indexOf(fish), 1)
         }
-        console.log("鱼鱼:", fish.x)
         this.drawOtherFish(fish)
         // 如果鱼超出边界，可以在这里处理
       }, 1000 / 100) // 60帧每秒
@@ -302,6 +359,24 @@ export default {
       // 处理从服务器广播的鱼的消失信息
       if(userId !== this.loginId) {
         this.fishes.splice(index, 1)
+        if(this.isMaster) {
+          this.scorePlayer += 1
+          store.commit('socket/setScore', { role: 'player', score: this.scorePlayer })
+        } else {
+          this.scoreMaster += 1
+          store.commit('socket/setScore', { role: 'master', score: this.scoreMaster })
+        }
+      }
+    })
+    // 监听 health 事件
+    this.socket.on('health', (userId, health) => {
+      // 处理从服务器广播的血量信息
+      if(userId !== this.loginId) {
+        if(this.isMaster) {
+          this.player.health = health
+        } else {
+          this.master.health = health
+        }
       }
     })
     // 设置定时器，在 created 时触发，每隔 2s 到 4s 向 socket 发起 emit 事件
@@ -315,8 +390,13 @@ export default {
     store.commit('socket/setSocket', this.socket)
   },
   beforeDestroy() {
-    // 清除定时器
-    clearInterval(this.fishTimer)
+    // 清除fishes里的所有定时器
+    for (const fish of this.fishes) {
+      clearInterval(fish.fishTimer)
+    }
+    // 清空画布
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this.fishCtx.clearRect(0, 0, this.fishCanvas.width, this.fishCanvas.height)
   },
 }
 </script>
