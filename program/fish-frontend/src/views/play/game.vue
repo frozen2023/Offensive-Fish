@@ -6,6 +6,22 @@
     <canvas id="otherfishCanvas" ref="otherfishCanvas">
       您的浏览器不支持canvas,请更换浏览器
     </canvas>
+    <div class="box">
+      <div class="box_display">
+        <div class="text">P1</div>
+        <div class="wrap">
+          <div class="health p1"></div>
+        </div>
+        <div class="score">{{ scoreMaster }}</div>
+      </div>
+      <div class="box_display">
+        <div class="text">P2</div>
+        <div class="wrap">
+          <div class="health p2"></div>
+        </div>
+        <div class="score">{{ scorePlayer }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,6 +47,7 @@ export default {
         y: 0,
         speed: 0.5,
         health: 100,
+        defense: 5,
         moving: {
           up: false,
           down: false,
@@ -44,6 +61,7 @@ export default {
         y: 0,
         speed: 0.5,
         health: 100,
+        defense: 5,
         moving: {
           up: false,
           down: false,
@@ -53,7 +71,6 @@ export default {
       },
       scoreMaster: 0,
       scorePlayer: 0,
-      eatKey: false,
       animationId: null,
       w: 35,
       h: 20,
@@ -147,10 +164,6 @@ export default {
       } else {
         role = this.player
       }
-      if(event.key === 'q' || event.key === 'Q') {
-        this.eatKey = true
-        console.log(event.key)
-      }
       switch (event.key) {
         case 'ArrowUp':
           role.moving.up = true
@@ -174,9 +187,6 @@ export default {
         role = this.master
       } else {
         role = this.player
-      }
-      if(event.key === 'q' || event.key === 'Q') {
-        this.eatKey = false
       }
       switch (event.key) {
         case 'ArrowUp':
@@ -220,14 +230,23 @@ export default {
       // 发送移动事件到其他玩家
       let pos = JSON.stringify({ x: role.x, y: role.y })
       this.socket.emit('move', this.roomId, pos)
-      let roler = { x: role.x, y: role.y, img: role.img }
+      let roler = { x: role.x, y: role.y, img: role.img, defense: role.defense }
       for (let i = 0; i < this.fishes.length; i++) {
         const fish = this.fishes[i]
         if (this.checkCollision(roler, fish)) {
           fish.isIn = true
-          if(this.eatKey) { // 玩家主动吃鱼
+          console.log('玩家战斗力:', roler.defense, ' 鱼战斗力:', fish.defense)
+          if(roler.defense >= fish.defense) {
             this.eatFish(fish, i)
             i-- // 更新索引，数组长度已经改变
+          } else {
+            if(this.isMaster) {
+              this.master.health -= 10
+              // this.socket.emit('health', this.roomId, this.master.health)
+            } else {
+              this.player.health -= 10
+              // this.socket.emit('health', this.roomId, this.player.health)
+            }
           }
         }
       }
@@ -318,7 +337,9 @@ export default {
         y = 0.86
       }
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
-      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null, eatTimer: null, isIn: false }
+      // defense 设置1-10的随机数
+      let defense = Math.floor(Math.random() * 10) + 1
+      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null, isIn: false, defense }
       if(lr === 0) {
         fish.img.src = fish1
       } else {
@@ -327,23 +348,6 @@ export default {
       // 通过定时器移动鱼
       fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
-        if(this.isIn && !this.eatKey) {
-          // 鱼攻击玩家的定时器
-          if(!fish.eatTimer) {
-            fish.eatTimer = setInterval(() => {
-              if(this.isMaster) {
-                this.master.health -= 10
-                // this.socket.emit('health', this.roomId, this.master.health)
-              } else {
-                this.player.health -= 10
-                // this.socket.emit('health', this.roomId, this.player.health)
-              }
-              // if(this.master.health <= 0 || this.player.health <= 0) {
-                // clearInterval(fish.eatTimer)
-              // }
-            }, 2000)
-          }
-        }
         if(fish.x < -35 || fish.x > this.canvas.width + 35) {
           clearInterval(fish.fishTimer)
           this.fishes.splice(this.fishes.indexOf(fish), 1)
@@ -418,5 +422,48 @@ export default {
   left: 0;
   width: 100vw;
   height: 100vh;
+}
+.box {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  width: 20%;
+  height: 15%;
+  &_display {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50%;
+    .text {
+      .pxfont(30);
+    }
+    .wrap {
+      margin-left: 5%;
+      width: 50%;
+      height: 20%;
+      border-radius: 1vw;
+      border: 0.1vw solid #000;
+    }
+    .health {
+      width: 100%;
+      height: 100%;
+      border-radius: 1vw;
+      transition: width 1s ease;
+    }
+    .score {
+      margin-left: 10%;
+      .pxfont(30);
+    }
+    .p1 {
+      background-color: #c73434;
+    }
+    .p2 {
+      background-color: #d0d85d;
+    }
+  }
 }
 </style>
