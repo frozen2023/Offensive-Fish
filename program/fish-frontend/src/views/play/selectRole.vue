@@ -129,6 +129,7 @@ export default {
       this.socket.emit('chooseRole', parseInt(this.roomId), parseInt(roleId))
     },
     sendMsg() {
+      if (!this.sendText) return
       this.socket.emit('sendRoomMessage', parseInt(this.roomId), this.sendText)
       this.sendText = '' // 清空发送文本框
     },
