@@ -8,16 +8,16 @@
         <thead>
           <tr>
             <th>排名</th>
-            <th>玩家ID</th>
-            <th>使用角色</th>
+            <th>玩家1ID</th>
+            <th>玩家2ID</th>
             <th>分数</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in limitedRankList" :key="index">
             <td>{{ item.rank }}</td>
-            <td>{{ item.id }}</td>
-            <td>{{ item.role }}</td>
+            <td>{{ item.firstPlayerId }}</td>
+            <td>{{ item.secondPlayerId }}</td>
             <td>{{ item.score }}</td>
           </tr>
         </tbody>
@@ -34,12 +34,6 @@ export default {
   data () {
     return {
       rankList: [
-        { rank: '1', id: 'player1', role: '角色A', score: '100' },
-        { rank: '2', id: 'player2', role: '角色B', score: '90' },
-        { rank: '3', id: 'player3', role: '角色C', score: '80' },
-        { rank: '1', id: 'player1', role: '角色A', score: '100' },
-        { rank: '2', id: 'player2', role: '角色B', score: '90' },
-        { rank: '3', id: 'player3', role: '角色C', score: '80' },
       ]
     }
   },
@@ -56,6 +50,7 @@ export default {
       await getRankList()
       .then(res => {
         console.log(res)
+        this.rankList = res.data
         this.$message.success('获取排行榜成功')
       })
       .catch(err => {
@@ -87,7 +82,7 @@ export default {
   border-radius: 1vw;
   overflow: hidden;
   margin: 0 auto;
-  width: 60%;
+  width: 80%;
 }
 
 th, td {
