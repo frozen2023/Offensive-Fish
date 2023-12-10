@@ -30,7 +30,7 @@
 <script>
 import backBtn from '@/components/backBtn.vue'
 import store from '@/store'
-
+import { insertRankList } from '@/api/rank.js'
 export default {
   name: 'settlement',
   components: {
@@ -70,17 +70,27 @@ export default {
     }
   },
   watch: {},
-  methods: {},
+  methods: {
+    async insertRank() {
+      await insertRankList(this.masterName, this.playerName, this.scores.master + this.scores.player)
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    }
+  },
   created () {
     const playerInfo = {
       master: {
         id: this.masterName,
-        role: this.masterRoleId,
+        role: this.masterRoleId == 1 ? '金枪鱼' : '鳐鱼',
         score: this.scores.master,
       },
       player: {
         id: this.playerName,
-        role: this.playerRoleId,
+        role: this.playerRoleId == 1 ? '金枪鱼' : '鳐鱼',
         score: this.scores.player,
       },
     }
@@ -92,6 +102,9 @@ export default {
     this.settleList.forEach((item, index) => {
       item.rank = index + 1
     })
+    if(localStorage.getItem('isMaster') == 'false') {
+      this.insertRank()
+    }
   },
 }
 </script>
