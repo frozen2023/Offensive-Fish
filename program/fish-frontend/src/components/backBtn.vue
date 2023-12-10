@@ -1,18 +1,31 @@
 <template>
   <div>
-    <button class="back" @click="$router.push('/home')">返回主界面</button>
+    <button class="back" @click="goHome()">返回主界面</button>
   </div>
 </template>
 
 <script>
+import store from '@/store'
 export default {
   name: 'back',
   data () {
     return {}
   },
   computed: {},
-  methods: {},
-  created () {},
+  methods: {
+    goHome() {
+      // 清除房间信息
+      store.commit('socket/setRoomId', '')
+      store.commit('socket/setMap', '0')
+      store.commit('socket/setMyRole', '0')
+      store.commit('socket/setPlayerRole', '0')
+      store.commit('socket/setChatMessages', [])
+      this.$router.push('/home')
+    }
+  },
+  created () {
+
+  },
 }
 </script>
 <style scoped lang='less'>
