@@ -26,12 +26,38 @@
 </template>
 
 <script>
-import fish1 from '@/assets/images/1.png'
-import fish2 from '@/assets/images/2.png'
-import fish1_turn from '@/assets/images/1_turn.png'
-import fish2_turn from '@/assets/images/2_turn.png'
+import fish1 from '@/assets/images/111.png'
+import fish2 from '@/assets/images/22.png'
+import fish1_turn from '@/assets/images/111_turn.png'
+import fish2_turn from '@/assets/images/22_turn.png'
+import fish3 from '@/assets/images/3.png'
+import fish4 from '@/assets/images/4.png'
+import fish5 from '@/assets/images/5.png'
+import fish6 from '@/assets/images/6.png'
+import fish7 from '@/assets/images/7.png'
+import fish8 from '@/assets/images/8.png'
+import fish9 from '@/assets/images/9.png'
+import fish10 from '@/assets/images/10.png'
+import fish11 from '@/assets/images/11.png'
+import fish12 from '@/assets/images/12.png'
+import fish13 from '@/assets/images/13.png'
+import fish14 from '@/assets/images/14.png'
+import fish15 from '@/assets/images/15.png'
+import fish3_turn from '@/assets/images/3_turn.png'
+import fish4_turn from '@/assets/images/4_turn.png'
+import fish5_turn from '@/assets/images/5_turn.png'
+import fish6_turn from '@/assets/images/6_turn.png'
+import fish7_turn from '@/assets/images/7_turn.png'
+import fish8_turn from '@/assets/images/8_turn.png'
+import fish9_turn from '@/assets/images/9_turn.png'
+import fish10_turn from '@/assets/images/10_turn.png'
+import fish11_turn from '@/assets/images/11_turn.png'
+import fish12_turn from '@/assets/images/12_turn.png'
+import fish13_turn from '@/assets/images/13_turn.png'
+import fish14_turn from '@/assets/images/14_turn.png'
+import fish15_turn from '@/assets/images/15_turn.png'
 import store from '@/store'
-import { mapActions } from 'vuex'
+
 export default {
   name: 'game',
   data () {
@@ -41,6 +67,8 @@ export default {
       ctx: null,
       fishCanvas: null,
       fishCtx: null,
+      acceleration: false,
+      accelerationTimer: null,
       player: {
         img: null,
         x: 0,
@@ -73,7 +101,7 @@ export default {
       scorePlayer: 0,
       animationId: null,
       w: 35,
-      h: 20,
+      h: 35,
       fishTimer: null, // 随机生成鱼的定时器
       randomInterval: null, // 随机请求时间间隔
       fishes: [], // 保存所有人机鱼的数组
@@ -90,12 +118,10 @@ export default {
       return store.getters.loginId
     },
     masterRole() {
-      // return store.getters.masterRoleId
-      return 1
+      return store.getters.masterRoleId
     },
     playerRole() {
-      // return store.getters.playerRoleId
-      return 2
+      return store.getters.playerRoleId
     }
   },
   watch: {
@@ -176,6 +202,18 @@ export default {
         case 'ArrowRight':
           role.moving.right = true
           break
+      }
+      if (event.key === '0' && !this.acceleration) {
+        this.acceleration = true
+        role.speed = 0.8
+        if (this.accelerationTimer) {
+          clearTimeout(this.accelerationTimer)
+        }
+        this.accelerationTimer = setTimeout(() => {
+          this.acceleration = false
+          this.master.speed = 0.5
+          this.player.speed = 0.5
+        }, 5000)
       }
       // 开始动画循环
       this.startAnimation()
@@ -281,10 +319,10 @@ export default {
     },
     checkCollision(obj1, obj2) {
       return (
-        obj1.x < obj2.x + 35 &&
-        obj1.x + 35 > obj2.x &&
-        obj1.y < obj2.y + 20 &&
-        obj1.y + 20 > obj2.y
+        obj1.x < obj2.x + this.w &&
+        obj1.x + this.w > obj2.x &&
+        obj1.y < obj2.y + this.h &&
+        obj1.y + this.h > obj2.y
       )
     },
     eatFish(fish, index) {
@@ -348,8 +386,8 @@ export default {
     this.socket.on('fish', (data) => {
       // 处理从服务器广播的鱼的生成信息
       console.log(data)
-      let { lr, SerialNum, y, num } = data
-      let x = lr === 0 ? -35 : this.canvas.width + 35 // 从左或右边界出现
+      let { lr, serialNum, y, num } = data
+      let x = lr === 0 ? -1*this.w : this.canvas.width + this.w // 从左或右边界出现
       let speed = 0.3
       if(y > 0.86) {
         y = 0.86
@@ -357,16 +395,18 @@ export default {
       // fish.img.src = `path/to/fish${SerialNum}.png` // 替换为你实际的鱼的图片路径
       // defense 设置1-10的随机数
       let defense = Math.floor(Math.random() * 10) + 1
-      let fish = { x, y: y*this.canvas.height, speed, SerialNum, lr, img: new Image(), fishTimer: null, isIn: false, defense, num }
+      let fish = { x, y: y*this.canvas.height, speed, serialNum, lr, img: new Image(), fishTimer: null, isIn: false, defense, num }
       if(lr === 0) {
-        fish.img.src = fish1
+        // fish.img.src = 'fish' + serialNum
+        fish.img.src = fish11
       } else {
-        fish.img.src = fish1_turn
+        // fish.img.src = 'fish' + serialNum + '_turn'
+        fish.img.src = 'fish' + serialNum + '_turn'
       }
       // 通过定时器移动鱼
       fish.fishTimer = setInterval(() => {
         fish.x += fish.speed * (lr === 0 ? 1 : -1)
-        if(fish.x < -35 || fish.x > this.canvas.width + 35) {
+        if(fish.x < -1*this.w || fish.x > this.canvas.width + this.w) {
           clearInterval(fish.fishTimer)
         }
         this.drawOtherFish(fish)
@@ -409,7 +449,6 @@ export default {
     this.randomInterval = Math.floor(Math.random() * (6000 - 4000 + 1) + 4000) // 随机间隔
     if(this.isMaster) {
       this.fishTimer = setInterval(() => {
-        console.log(this.randomInterval)
         this.socket.emit('fishSpace', this.roomId)
       }, this.randomInterval)
     }
