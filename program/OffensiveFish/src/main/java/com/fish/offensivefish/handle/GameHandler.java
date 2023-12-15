@@ -25,6 +25,7 @@ import java.util.Set;
 @Slf4j
 @Component
 public class GameHandler {
+    public  int Num=0;
     @Autowired
     UserMapper userMapper;
     @Autowired
@@ -40,7 +41,6 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
@@ -67,17 +67,16 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
-                System.out.println("ewqq");
+
                 int isPrepare=0;//是否是房主
                 if(roomMapper.selectRoomById(roomId).getRoomOwnerId().equals(userId)){
                     isPrepare=1;
                 }
                 socketIoServer.getRoomOperations(room).sendEvent("message",new MessageGame(userId,user.getName(),"取消准备!",isPrepare,0));;
-                System.out.println("取消准备");
+
             }
 
         }
@@ -96,7 +95,7 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 socketIoServer.getRoomOperations(room).sendEvent("message",new RoleMessage(role,userId,user.getName(),"选择英雄成功!"));;
             }
         }
@@ -114,7 +113,7 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
@@ -136,7 +135,7 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
@@ -158,7 +157,7 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 socketIoServer.getRoomOperations(room).sendEvent("message",new MapMessage(map,userId,user.getName(),"选择地图成功!"));;
             }
         }
@@ -176,7 +175,7 @@ public class GameHandler {
         User user=userMapper.selectUser(userId);
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 socketIoServer.getRoomOperations(room).sendEvent("message",new MapMessage(1,userId,user.getName(),"开始选择英雄!"));;
             }
         }
@@ -187,16 +186,53 @@ public class GameHandler {
     }
     @OnEvent("fishSpace")
     void retFishSpace(SocketIOClient client,int roomId){
-        int lr= (int) (Math.random()%2);//0代表左边，1代表右边
-        int SerialNum= (int) ((Math.random()*roomId)%10);//返回鱼的序号
-        double y= (double) ((Math.random())%100)/100;//返回鱼的y坐标
+        Num++;
+        int lr= (int) ((Math.random()*2));//0代表左边，1代表右边
+        int SerialNum= (int) ((Math.random()*roomId)%13)+3;//返回鱼的序号
+        double y= ((Math.random())*100)/100;//返回鱼的y坐标
         String roomId1= String.valueOf(roomId);
         String userId=client.getHandshakeData().getSingleUrlParam("userId");
         Set<String> allRooms = client.getAllRooms();
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
-                socketIoServer.getRoomOperations(room).sendEvent("fish",new FishSpace(lr,SerialNum,y));;
+               // log.info("房间：{}",room);
+                socketIoServer.getRoomOperations(room).sendEvent("fish",new FishSpace(lr,SerialNum,y,Num));;
+            }
+        }
+    }
+    @OnEvent("eatFish")
+    public void eatFish(SocketIOClient client,int roomId,int index){
+        String userId = client.getHandshakeData().getSingleUrlParam("userId");
+        String roomId1= String.valueOf(roomId);
+        Set<String> allRooms = client.getAllRooms();
+        for (String room:allRooms){
+            if(roomId1.equals(room)){
+
+                //   log.info("房间：{}",room);
+                //发送给指定空间名称以及房间的人，并且排除不发给自己
+
+                // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
+                //发送给指定空间名称以及房间的人，包括自己
+                socketIoServer.getRoomOperations(room).sendEvent("anotherEat",userId,index);
+            }
+
+        }
+
+    }
+    @OnEvent("health")
+    public void health(SocketIOClient client,int roomId,int nowHealth){
+        String userId = client.getHandshakeData().getSingleUrlParam("userId");
+        String roomId1= String.valueOf(roomId);
+        Set<String> allRooms = client.getAllRooms();
+        for (String room:allRooms){
+            if(roomId1.equals(room)){
+
+                //   log.info("房间：{}",room);
+                //发送给指定空间名称以及房间的人，并且排除不发给自己
+
+                // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
+                //发送给指定空间名称以及房间的人，包括自己
+                socketIoServer.getRoomOperations(room).sendEvent("health",userId,nowHealth);
             }
         }
     }
@@ -217,4 +253,5 @@ class FishSpace{
     int lr;
     int SerialNum;
     double y;
+    int Num;
 }

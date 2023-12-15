@@ -39,7 +39,7 @@ public class RoomHandler {
         System.out.println(userId+"加入房间");
         User user=userMapper.selectUser(userId);
         Set<String> allRooms = client.getAllRooms();
-        System.out.println(allRooms.size());
+
         for(String room:allRooms){
             System.out.println("room"+room);
         }
@@ -50,8 +50,7 @@ public class RoomHandler {
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
-                System.out.println("加入房间信息");
-                System.out.println("userId"+userId+"roomId"+roomId);
+
                 int isMaster=0;//是否是房主
                 if(roomMapper.selectRoomById(roomId).getRoomOwnerId().equals(userId)){
                     isMaster=1;
@@ -73,7 +72,7 @@ public class RoomHandler {
         Set<String> allRooms = client.getAllRooms();
         client.joinRoom(roomId1);
         String userId = client.getHandshakeData().getSingleUrlParam("userId");
-        System.out.println(userId+"离开房间"+roomId1);
+
         User user=userMapper.selectUser(userId);;
         System.out.println(allRooms.size());
         for(String room:allRooms){
@@ -81,11 +80,10 @@ public class RoomHandler {
         }
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
-                //发送给指定空间名称以及房间的人，并且排除不发给自己
+
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
-                System.out.println("ewqq");
+
                 int isMaster=0;//是否是房主
                 if(roomMapper.selectRoomById(roomId).getRoomOwnerId().equals(userId)){
                     isMaster=1;
@@ -109,7 +107,7 @@ public class RoomHandler {
         Set<String> allRooms = client.getAllRooms();
         for (String room:allRooms){
             if(roomId1.equals(room)){
-                log.info("房间：{}",room);
+
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
                 //发送给指定空间名称以及房间的人，包括自己
@@ -130,7 +128,7 @@ public class RoomHandler {
         Set<String> allRooms = client.getAllRooms();
         for (String room:allRooms){
             if(roomId.equals(room)){
-                log.info("房间：{}",room);
+             //   log.info("房间：{}",room);
                 //发送给指定空间名称以及房间的人，并且排除不发给自己
 
                 // socketIoServer.getNamespace("/socketIO").getRoomOperations(room).sendEvent("message",client, data);
