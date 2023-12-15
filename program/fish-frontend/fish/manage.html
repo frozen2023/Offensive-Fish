@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏结算画面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-over {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            margin: 1rem 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-over">
+        <h1>游戏结束</h1>
+        <p>恭喜你完成了游戏！</p>
+        <button onclick="reload()">重新开始</button>
+    </div>
+    <script>
+        function reload(){
+            window.location.href = "fish.html";
+        }
+    </script>
+</body>
+</html>

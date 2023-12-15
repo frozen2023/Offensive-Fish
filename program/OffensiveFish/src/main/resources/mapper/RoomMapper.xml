@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.offensivefish.mapper.RoomMapper">
+    <insert id="insertRoom" parameterType="com.fish.offensivefish.pojo.Room">
+        insert into offensivefish.room (roomownerid,playerid,code,numbers,isopen)
+        values (#{roomOwnerId},#{playerId},#{code},#{numbers},#{isOpen});
+    </insert>
+    <select id="selectRoomById" resultType="com.fish.offensivefish.pojo.Room">
+        select *from offensivefish.room
+        where roomid= #{RoomId}
+    </select>
+    <select id="selectRoomByCode" resultType="Integer">
+        select roomId from offensivefish.room
+        where code= #{code}
+    </select>
+    <select id="selectAllRoom" resultType="com.fish.offensivefish.pojo.Room">
+        select *from offensivefish.room
+    </select>
+    <update id="updateRoomStatusInc">
+        update offensivefish.room
+        set isOpen=0,numbers=2,playerId=#{playerId}
+        where roomid=#{RoomId};
+    </update>
+    <update id="updateRoomStatusDec">
+        update offensivefish.room
+        set isOpen=1,numbers=1,playerId=#{playerId}
+        where roomid=#{RoomId};
+    </update>
+    <delete id="deleteRoom">
+        delete from offensivefish.room
+        where roomid=#{RoomId};
+    </delete>
+</mapper>

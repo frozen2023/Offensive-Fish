@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.offensivefish.mapper.UserMapper">
+    <select id="selectUser" resultType="com.fish.offensivefish.pojo.User">
+        select *from offensivefish.user
+        where userName= #{userName}
+    </select>
+    <insert id="insertUser" parameterType="com.fish.offensivefish.pojo.User">
+        insert into offensivefish.user (userName,passwd,name,status)
+        values (#{userName},#{passwd},#{name},#{status});
+    </insert>
+    <update id="updateUserPasswd">
+
+        update offensivefish.user
+        set passwd=#{passwd}
+        where userName=#{userName};
+    </update>
+    <update id="updateStatus">
+        update offensivefish.user
+        set status=#{status}
+        where userName=#{userName};
+    </update>
+</mapper>

@@ -4,3 +4,23 @@
 
 https://boardmix.cn/app/share/CAE.CJXtrA0gASoQXySm1km2CdRuWiXLvYKXKjAFQAE/uPPUpF，
 点击链接加入boardmix中的文件「E-R图」
+## 11.10   陈浩楠 更新了类图、开始学习MFC 完成任务时长：5h 剩余时间 0h，遇到问题：VS2022上配置MFC困难 解决：找博客
+
+https://boardmix.cn/app/share/CAE.CJXtrA0gASoQBQ1a9kooLk49VUWy8MNwazAFQAE/uPPUpF，
+点击链接加入boardmix中的文件「未命名文件」
+## 11.11   陈浩楠 更新活动图、继续学习MFC  完成任务时长：5h 剩余时间 0h，遇到问题：难以建立框架意识 解决：阅读博客
+
+![活动图](https://github.com/frozen2023/Offensive-Fish/assets/103918091/2399b13c-6531-4a1a-badd-73f43f50a5b5)
+## 11.12   陈浩楠 学习游戏玩法开发，实现MFC和mysql连接  完成任务时长：6h 剩余时间 0h，遇到问题：无
+
+## 11.13 完成任务：学习mfc，学习设计游戏玩法，任务时长6小时，剩余时间0h，遇到问题:对游戏的设计没有头绪，解决：还没有解决
+
+## 11.14 陈浩楠 学习Qt，学习游戏策划
+
+## 11.15 陈浩楠 学习Qt，学习游戏策划
+
+## 11.16 陈浩楠 和前端交谈细节实现、学习Qt 4h 0h
+
+## 11.17 陈浩楠 和前端交谈细节实现、学习Qt、学习游戏设计
+
+##

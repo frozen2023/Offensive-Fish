@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.offensivefish.mapper.FriendLinkMapper">
+    <insert id="insertFriendLink">
+        INSERT INTO offensivefish.friendlink (onefriendid, twofriendid)
+        VALUES (#{oneFriendId}, #{twoFriendId});
+    </insert>
+
+    <delete id="deleteAFriendLink">
+        DELETE FROM offensivefish.friendlink
+        WHERE (onefriendid = #{oneFriendId} and twofriendid = #{twoFriendId}) or (onefriendid = #{twoFriendId} and twofriendid = #{oneFriendId});
+    </delete>
+
+    <select id="selectAll" resultType="com.fish.offensivefish.pojo.FriendLink">
+        SELECT *
+        FROM offensivefish.friendlink
+        WHERE onefriendid = #{userName} or twofriendid = #{userName};
+    </select>
+
+    <select id="selectOne" resultType="com.fish.offensivefish.pojo.FriendLink">
+        SELECT *
+        FROM offensivefish.friendlink
+        WHERE (onefriendid = #{oneFriendId} and twofriendid = #{twoFriendId}) or (onefriendid = #{twoFriendId} and twofriendid = #{oneFriendId});
+    </select>
+</mapper>
