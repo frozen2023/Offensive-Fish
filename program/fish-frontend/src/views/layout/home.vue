@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { bus } from '@/main.js'
 export default {
   name: 'home',
   data () {
@@ -58,6 +59,7 @@ export default {
   computed: {},
   methods: {
     goPlay() {
+      bus.$emit('play-menu-music')
       if(!this.$store.getters.token) {
         this.$message({
           message: '请先登录',
