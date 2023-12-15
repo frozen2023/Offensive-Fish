@@ -7,8 +7,10 @@
       <div class="area_body_left" @click="left()">
         <div class="area_body_left_arrow"></div>
       </div>
-      <div class="area_body_map" v-for="(map) in displayedMaps" :key="map.id" @click="slected(map.id)">{{ map.name }}
+      <div class="area_body_map" v-for="(map) in displayedMaps" :key="map.id" @click="slected(map.id)">
         <i class="slected" v-show="map.slected">已选择</i>
+        <img src="@/assets/images/bg.png" alt="">
+        <span>{{ map.name }}</span>
       </div>
       <div class="area_body_right" @click="right()">
         <div class="area_body_right_arrow"></div>
@@ -169,6 +171,7 @@ export default {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    gap: 2vw;
     height: 64vh;
     width: 100%;
     padding: 0 5vw;
@@ -192,14 +195,14 @@ export default {
       }
     }
     &_left {
-      margin-right: 4vw;
+      margin-right: 2vw;
       &_arrow {
         border-left: 0vw solid transparent;
         border-right: 2vw solid black;
       }
     }
     &_right {
-      margin-left: 4vw;
+      margin-left: 2vw;
       &_arrow {
         border-right: 0vw solid transparent;
         border-left: 2vw solid black;
@@ -207,11 +210,21 @@ export default {
     }
     &_map {
       position: relative;
-      margin-right: 4vw;
       height: 45vh;
       width: 45vh;
       background-color: #f3f1f1;
       cursor: pointer;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+      span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        .pxfont(18);
+        color: #fff;
+      }
       &:nth-child(4) {
         margin-right: 0;
       }
@@ -226,6 +239,7 @@ export default {
         background-color: #fff;
         text-align: center;
         .pxfont(22);
+        z-index: 10;
       }
     }
   }
