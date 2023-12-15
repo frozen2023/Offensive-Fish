@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { bus } from '@/main.js'
 import store from '@/store'
 export default {
   name: 'slectRole',
@@ -133,6 +134,9 @@ export default {
       this.socket.emit('sendRoomMessage', parseInt(this.roomId), this.sendText)
       this.sendText = '' // 清空发送文本框
     },
+    stopMusic() {
+      bus.$emit('stop-music')
+    },
   },
   created () {
     this.isMaster = localStorage.getItem('isMaster')
@@ -158,6 +162,12 @@ export default {
       }, 1000)
     }
   },
+  beforeDestroy() {
+    clearInterval(this.timer)
+    this.timer = null
+    bus.$emit('stop-music')
+    bus.$emit('play-game-music')
+  }
 }
 </script>
 <style scoped lang='less'>

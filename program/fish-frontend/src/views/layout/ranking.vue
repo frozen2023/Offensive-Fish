@@ -49,7 +49,6 @@ export default {
     async getRank() {
       await getRankList()
       .then(res => {
-        console.log(res)
         this.rankList = res.data
         this.$message.success('获取排行榜成功')
       })

@@ -231,13 +231,11 @@ export default {
             type: 'success',
             duration: 2000
           })
-          // console.log(this.socket.getSession());
           this.master.name = store.getters.userName + '(我)'
         })
         this.socket.emit("joinRoom", this.roomInfo.roomId)
         //监听消息
         this.socket.on('message', (data) => {
-          console.log(data)
           if(data.isMaster !== 1 && data.msg == '进入房间！') {
             this.player.name = data.name
             this.$message({

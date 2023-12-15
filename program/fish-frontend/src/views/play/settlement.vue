@@ -73,13 +73,10 @@ export default {
   methods: {
     async insertRank() {
       await insertRankList(this.masterName, this.playerName, this.scores.master + this.scores.player)
-      .then(res => {
-        console.log(res)
-      })
       .catch(err => {
         console.log(err)
       })
-    }
+    },
   },
   created () {
     const playerInfo = {
