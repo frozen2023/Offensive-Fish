@@ -7,7 +7,7 @@
           <thead>
             <tr>
               <th>排名</th>
-              <th>玩家ID</th>
+              <th>玩家</th>
               <th>角色</th>
               <th>分数</th>
             </tr>
@@ -29,6 +29,8 @@
 
 <script>
 import backBtn from '@/components/backBtn.vue'
+import store from '@/store'
+import { insertRankList } from '@/api/rank.js'
 export default {
   name: 'settlement',
   components: {
@@ -37,15 +39,70 @@ export default {
   data () {
     return {
       settleList: [
-        { rank: '1', id: '玩家1', role: '角色1', score: '13353' },
-        { rank: '2', id: '玩家2', role: '角色2', score: '6593' },
+        { rank: '', id: '', role: '', score: '' },
+        { rank: '', id: '', role: '', score: '' },
       ]
     }
   },
-  computed: {},
+  computed: {
+    scores() {
+      return store.getters.scores
+    },
+    masterRoleId() {
+      return store.getters.masterRoleId
+    },
+    playerRoleId() {
+      return store.getters.playerRoleId
+    },
+    masterName() {
+      if(localStorage.getItem('isMaster') == 'false') {
+        return localStorage.getItem('playerName')
+      } else {
+        return store.getters.userName
+      }
+    },
+    playerName() {
+      if(localStorage.getItem('isMaster') == 'false') {
+        return store.getters.userName
+      } else {
+        return localStorage.getItem('playerName')
+      }
+    }
+  },
   watch: {},
-  methods: {},
-  created () {},
+  methods: {
+    async insertRank() {
+      await insertRankList(this.masterName, this.playerName, this.scores.master + this.scores.player)
+      .catch(err => {
+        console.log(err)
+      })
+    },
+  },
+  created () {
+    const playerInfo = {
+      master: {
+        id: this.masterName,
+        role: this.masterRoleId == 1 ? '金枪鱼' : '鳐鱼',
+        score: this.scores.master,
+      },
+      player: {
+        id: this.playerName,
+        role: this.playerRoleId == 1 ? '金枪鱼' : '鳐鱼',
+        score: this.scores.player,
+      },
+    }
+    this.settleList = Object.values(playerInfo)
+    // 按分数进行排序，并且添加排名
+    this.settleList.sort((a, b) => {
+      return b.score - a.score
+    })
+    this.settleList.forEach((item, index) => {
+      item.rank = index + 1
+    })
+    if(localStorage.getItem('isMaster') == 'false') {
+      this.insertRank()
+    }
+  },
 }
 </script>
 <style scoped lang='less'>

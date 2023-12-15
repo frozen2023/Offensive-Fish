@@ -34,6 +34,9 @@ export default new Vuex.Store({
     chatMessages (state) {
       return state.socket.chatMessages
     },
+    scores(state) {
+      return state.socket.scores
+    }
   },
   modules: {
     user,

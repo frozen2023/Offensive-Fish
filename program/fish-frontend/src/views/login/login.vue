@@ -56,7 +56,6 @@ export default {
         this.$router.replace(url)
       })
       .catch(err => {
-        console.log(err)
         this.$message.error('登陆失败')
       })
     }

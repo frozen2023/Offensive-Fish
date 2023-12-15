@@ -11,6 +11,10 @@ export default {
       masterRoleId: '0',
       playerRoleId: '0',
       chatMessages: [],
+      scores: {
+        master: 0,
+        player: 0,
+      }
     }
   },
   mutations: {
@@ -30,11 +34,10 @@ export default {
       state.playerRoleId = roleId
     },
     setChatMessages(state, messagesObj) {
-      console.log(messagesObj)
       state.chatMessages.push(messagesObj)
     },
-  },
-  actions: {
-  },
-  getters: {}
+    setScore(state, { role, score }) {
+      state.scores[role] = score
+    },
+  }
 }

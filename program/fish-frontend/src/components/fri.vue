@@ -61,7 +61,6 @@ export default {
         this.friList = res.data
       })
       .catch((err) => {
-        console.log(err)
         this.$message({
           message: '获取好友列表失败',
           type: 'error',

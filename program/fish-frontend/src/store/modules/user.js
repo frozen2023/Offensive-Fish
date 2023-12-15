@@ -19,9 +19,6 @@ export default {
     logout (context) {
       // 个人信息重置
       context.commit('setUserInfo', {})
-
-      // 历史信息信息要重置 (跨模块调用 mutation)
-      // context.commit('myhistory/setHistoryList', [], { root: true })
     }
   },
   getters: {}
